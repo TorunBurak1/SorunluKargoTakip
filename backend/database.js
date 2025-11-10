@@ -1,4 +1,5 @@
 const { Pool } = require('pg');
+const dns = require('dns');
 require('dotenv').config();
 
 // Not: Bu dosya artık PostgreSQL kullanıyor (SQLite yerine)
@@ -35,33 +36,48 @@ class DatabaseManager {
       }
       
       try {
-        // Supabase için connection string'i düzelt (IPv6 sorununu çöz)
-        let connectionString = databaseUrl;
+        // Supabase için connection string'i parse et ve IPv4 kullan
+        let poolConfig;
+        
         if (databaseUrl.includes('supabase')) {
-          // Supabase connection string'inde hostname kullan (IPv4 DNS çözümlemesi)
-          // Örnek: postgresql://postgres:pass@db.xxxxx.supabase.co:5432/postgres
-          // IPv6 adresi varsa hostname'e çevir
           try {
             const url = new URL(databaseUrl);
-            // Eğer hostname IPv6 adresi ise, domain adını kullan
-            if (url.hostname.includes(':')) {
-              // IPv6 adresi varsa, domain adını kullan
-              const domainMatch = databaseUrl.match(/@([^:]+):/);
-              if (domainMatch) {
-                const domain = domainMatch[1];
-                connectionString = databaseUrl.replace(url.hostname, domain);
-              }
-            }
+            const hostname = url.hostname;
+            const port = url.port || 5432;
+            const database = url.pathname.slice(1) || 'postgres';
+            const username = url.username || 'postgres';
+            const password = url.password || '';
+            
+            // DNS lookup'u IPv4'e zorla
+            dns.setDefaultResultOrder('ipv4first');
+            
+            poolConfig = {
+              host: hostname,
+              port: parseInt(port),
+              database: database,
+              user: username,
+              password: password,
+              ssl: { rejectUnauthorized: false },
+              // IPv4 zorla
+              connectionTimeoutMillis: 10000,
+            };
+            
+            console.log(`📡 Bağlantı: ${username}@${hostname}:${port}/${database}`);
           } catch (e) {
-            // URL parse hatası, orijinal string'i kullan
-            console.log('⚠️ Connection string parse edilemedi, orijinal kullanılıyor');
+            console.error('⚠️ Connection string parse edilemedi, connection string kullanılıyor:', e.message);
+            poolConfig = {
+              connectionString: databaseUrl,
+              ssl: { rejectUnauthorized: false },
+            };
           }
+        } else {
+          poolConfig = {
+            connectionString: databaseUrl,
+            ssl: false,
+          };
         }
         
-        this.pool = new Pool({
-          connectionString: connectionString,
-          ssl: databaseUrl.includes('supabase') ? { rejectUnauthorized: false } : false,
-        });
+        this.pool = new Pool(poolConfig);
 
         // Bağlantıyı test et
         this.pool.query('SELECT NOW()', (err, result) => {
