@@ -39,10 +39,11 @@ class DatabaseManager {
         // Supabase için connection string'i parse et ve IPv4 kullan
         let poolConfig;
         
+        // DNS lookup'u IPv4'e zorla
+        dns.setDefaultResultOrder('ipv4first');
+        
+        // Supabase veya Neon için özel işlem
         if (databaseUrl.includes('supabase')) {
-          // DNS lookup'u IPv4'e zorla
-          dns.setDefaultResultOrder('ipv4first');
-          
           // Connection string'den query parametrelerini temizle
           let cleanUrl = databaseUrl.split('?')[0];
           
@@ -91,7 +92,25 @@ class DatabaseManager {
               connectionTimeoutMillis: 10000,
             };
           }
+        } else if (databaseUrl.includes('neon')) {
+          // Neon için connection string'i direkt kullan (SSL gerekli)
+          poolConfig = {
+            connectionString: databaseUrl,
+            ssl: { 
+              rejectUnauthorized: false,
+              require: true
+            },
+            connectionTimeoutMillis: 10000,
+          };
+          
+          try {
+            const url = new URL(databaseUrl);
+            console.log(`📡 Bağlantı: ${url.username}@${url.hostname}:${url.port || 5432}/${url.pathname.slice(1) || 'neondb'} (Neon)`);
+          } catch (e) {
+            console.log(`📡 Bağlantı: Neon PostgreSQL`);
+          }
         } else {
+          // Diğer PostgreSQL veritabanları
           poolConfig = {
             connectionString: databaseUrl,
             ssl: false,
