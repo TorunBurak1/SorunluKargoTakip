@@ -5,11 +5,41 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start:persistent": "node start-persistent.js",
+    "start:mongodb": "node server-mongodb.js",
+    "dev": "nodemon server.js",
+    "dev:persistent": "nodemon start-persistent.js",
+    "dev:mongodb": "nodemon server-mongodb.js",
+    "db:init": "node scripts/auto-db.js",
+    "db:backup": "node scripts/auto-db.js --backup",
+    "db:stats": "node scripts/auto-db.js --stats",
+    "db:check": "node scripts/auto-db.js --check",
+    "backup:manual": "node scripts/backup-scheduler.js --manual",
+    "backup:stats": "node scripts/backup-scheduler.js --stats",
+    "backup:status": "node scripts/backup-scheduler.js --status",
+    "backup:daily": "node scripts/backup-scheduler.js --daily",
+    "backup:weekly": "node scripts/backup-scheduler.js --weekly",
+    "setup": "npm run db:init && npm start",
+    "dev:full": "npm run db:init && npm run dev",
+    "mongodb:seed": "node scripts/seed-data.js",
+    "mongodb:setup": "npm run mongodb:seed && npm run start:mongodb",
+    "start:local": "node server-local-mongodb.js",
+    "dev:local": "nodemon server-local-mongodb.js",
+    "start:simple": "node server-simple.js",
+    "dev:simple": "nodemon server-simple.js",
+    "check:data": "node check-data.js",
+    "test:api": "node test-api.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.18.2",
+    "mongodb-memory-server": "^10.2.3",
+    "mongoose": "^8.19.1",
+    "node-cron": "^3.0.3",
+    "node-fetch": "^2.7.0",
+    "pg": "^8.16.3",
     "sqlite3": "^5.1.6",
     "uuid": "^9.0.1"
   },
@@ -17,4 +47,3 @@
     "nodemon": "^3.0.2"
   }
 }
-

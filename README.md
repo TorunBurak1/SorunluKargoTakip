@@ -120,3 +120,4 @@ npm run dev  # Vite development server
 
 Bu proje MIT lisansı altında lisanslanmıştır.
 
+

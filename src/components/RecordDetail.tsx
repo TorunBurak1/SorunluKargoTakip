@@ -1,19 +1,32 @@
 import React from 'react';
-import { ArrowLeft, Package, Calendar, User, Camera, Edit, Trash2 } from 'lucide-react';
-import { CargoRecord, CARRIER_COMPANIES } from '../types';
+import { ArrowLeft, Package, Calendar, User, Camera, Building2, Truck } from 'lucide-react';
+import { CargoRecord, RecordStatus, CARRIER_COMPANIES } from '../types';
 
 interface RecordDetailProps {
   record: CargoRecord;
   onBack: () => void;
   isAdmin?: boolean;
-  onUpdateRecord?: (id: string, updates: Partial<Omit<CargoRecord, 'id' | 'createdBy' | 'createdByName' | 'createdAt'>>) => void;
-  onDeleteRecord?: (id: string) => void;
 }
 
-export const RecordDetail: React.FC<RecordDetailProps> = ({ record, onBack, isAdmin = false, onUpdateRecord, onDeleteRecord }) => {
-  const getCarrierCompanyLabel = (carrierCompany: string) => {
-    const company = CARRIER_COMPANIES.find(c => c.value === carrierCompany);
-    return company ? company.label : carrierCompany;
+export const RecordDetail: React.FC<RecordDetailProps> = ({ record, onBack, isAdmin = false }) => {
+  const getStatusColor = (status: RecordStatus) => {
+    switch (status) {
+      case 'open': return 'bg-orange-100 text-orange-800 border-orange-200';
+      case 'in_progress': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'resolved': return 'bg-green-100 text-green-800 border-green-200';
+      case 'paid': return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+      case 'rejected': return 'bg-red-100 text-red-800 border-red-200';
+    }
+  };
+
+  const getStatusText = (status: RecordStatus) => {
+    switch (status) {
+      case 'open': return 'Açık';
+      case 'in_progress': return 'İşlemde';
+      case 'resolved': return 'Çözüldü';
+      case 'paid': return 'Ödendi';
+      case 'rejected': return 'Reddedildi';
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -43,7 +56,7 @@ export const RecordDetail: React.FC<RecordDetailProps> = ({ record, onBack, isAd
               <Package className="h-8 w-8 text-teal-500" />
               <div className="ml-3">
                 <h1 className="text-xl font-semibold text-gray-900">Kayıt Detayı</h1>
-                <p className="text-sm text-gray-600">{record.barcodeNumber}</p>
+                <p className="text-sm text-gray-600">Barkod: {record.barcodeNumber}</p>
               </div>
             </div>
           </div>
@@ -54,49 +67,190 @@ export const RecordDetail: React.FC<RecordDetailProps> = ({ record, onBack, isAd
         {/* Main Info Card */}
         <div className="bg-white rounded-xl shadow-sm border p-8 mb-8">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-6">
-            <div className="mb-4 lg:mb-0">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">{record.barcodeNumber}</h2>
-              <div className="flex items-center space-x-4 mb-4">
-                <span className="px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800">
-                  {record.exitNumber}
-                </span>
-                <div className="flex items-center text-gray-600">
-                  <User className="w-4 h-4 mr-1" />
-                  <span className="text-sm">{record.createdByName}</span>
+            <div className="mb-4 lg:mb-0 flex-1">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Kargo Bilgileri</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="flex items-start space-x-3">
+                  <Package className="w-5 h-5 text-gray-500 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-gray-500">Barkod Numarası</p>
+                    <p className="font-semibold text-gray-900">{record.barcodeNumber}</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <Package className="w-5 h-5 text-gray-500 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-gray-500">Çıkış Numarası</p>
+                    <p className="font-semibold text-gray-900">{record.exitNumber}</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <Truck className="w-5 h-5 text-gray-500 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-gray-500">Taşıyıcı Firma (Kargo Şirketi)</p>
+                    <p className="font-semibold text-gray-900">
+                      {CARRIER_COMPANIES.find(c => c.value === record.carrierCompany)?.label}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <Building2 className="w-5 h-5 text-gray-500 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-gray-500">Gönderici Firma</p>
+                    <p className="font-semibold text-gray-900">{record.senderCompany}</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <User className="w-5 h-5 text-gray-500 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-gray-500">Alıcı Adı Soyadı</p>
+                    <p className="font-semibold text-gray-900">{record.recipientName}</p>
+                  </div>
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="font-medium text-gray-700">Taşıyıcı Firma:</span>
-                  <span className="ml-2 text-gray-900">{getCarrierCompanyLabel(record.carrierCompany)}</span>
+              <div className="flex items-center justify-between pt-4 border-t">
+                <div className="flex items-center text-gray-600">
+                  <User className="w-4 h-4 mr-1" />
+                  <span className="text-sm">Kaydı Oluşturan: {record.createdByName}</span>
                 </div>
-                <div>
-                  <span className="font-medium text-gray-700">Gönderici Firma:</span>
-                  <span className="ml-2 text-gray-900">{record.senderCompany}</span>
-                </div>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(record.status)}`}>
+                  {getStatusText(record.status)}
+                </span>
               </div>
             </div>
             
-            {isAdmin && (
-              <div className="flex space-x-3">
-                <button
-                  onClick={() => onDeleteRecord && onDeleteRecord(record.id)}
-                  className="flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Sil
-                </button>
-              </div>
-            )}
           </div>
 
           {/* Description */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold text-gray-900 mb-3">Açıklama</h3>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-gray-700 leading-relaxed">{record.description}</p>
+            <div className="bg-gray-50 rounded-lg p-4 mb-4">
+              <div className="text-gray-700 leading-relaxed whitespace-pre-line">
+                {record.description.split('\n\n[')[0]}
+              </div>
             </div>
           </div>
+
+          {/* Status Notes */}
+          {(record.resolutionNote || record.paymentNote || record.rejectionReason) && (
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Durum Notları</h3>
+              <div className="space-y-3">
+                {record.resolutionNote && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className="flex items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center mb-2">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200 mr-2">
+                            Çözüldü
+                          </span>
+                          {record.statusUpdatedAt && (
+                            <span className="text-xs text-gray-500">
+                              {new Date(record.statusUpdatedAt).toLocaleDateString('tr-TR', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                          {record.resolutionNote}
+                        </p>
+                        {record.statusUpdatedByName && (
+                          <p className="text-xs text-gray-500 mt-2">
+                            Güncelleyen: {record.statusUpdatedByName}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {record.paymentNote && (
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                    <div className="flex items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center mb-2">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200 mr-2">
+                            Ödendi
+                          </span>
+                          {record.statusUpdatedAt && (
+                            <span className="text-xs text-gray-500">
+                              {new Date(record.statusUpdatedAt).toLocaleDateString('tr-TR', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                          {record.paymentNote}
+                        </p>
+                        {record.statusUpdatedByName && (
+                          <p className="text-xs text-gray-500 mt-2">
+                            Güncelleyen: {record.statusUpdatedByName}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {record.rejectionReason && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="flex items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center mb-2">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200 mr-2">
+                            Reddedildi
+                          </span>
+                          {record.statusUpdatedAt && (
+                            <span className="text-xs text-gray-500">
+                              {new Date(record.statusUpdatedAt).toLocaleDateString('tr-TR', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                          {record.rejectionReason}
+                        </p>
+                        {record.statusUpdatedByName && (
+                          <p className="text-xs text-gray-500 mt-2">
+                            Güncelleyen: {record.statusUpdatedByName}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Description History (if there are multiple notes in description) */}
+          {record.description.includes('\n\n[') && (
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Durum Geçmişi</h3>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="text-gray-700 leading-relaxed whitespace-pre-line text-sm">
+                  {record.description.split('\n\n[').slice(1).map((note, index) => (
+                    <div key={index} className="mb-2 pb-2 border-b border-gray-200 last:border-0">
+                      [{note}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Photos */}
           {record.photos.length > 0 && (
@@ -145,18 +299,6 @@ export const RecordDetail: React.FC<RecordDetailProps> = ({ record, onBack, isAd
           </div>
         </div>
 
-        {/* Action Buttons for Mobile */}
-        {isAdmin && (
-          <div className="lg:hidden space-y-3">
-            <button
-              onClick={() => onDeleteRecord && onDeleteRecord(record.id)}
-              className="w-full flex items-center justify-center px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Sil
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -1,58 +1,157 @@
-import React, { useState } from 'react';
-import { Plus, Package, Calendar, Camera, FileText, LogOut } from 'lucide-react';
-import { CargoRecord, User, CARRIER_COMPANIES } from '../types';
+import React, { useState, useEffect } from 'react';
+import { Plus, Package, Calendar, Camera, FileText, LogOut, X, Search } from 'lucide-react';
+import { CargoRecord, User, RecordStatus, CARRIER_COMPANIES } from '../types';
+import { useRecords } from '../contexts/RecordsContext';
 
 interface StaffDashboardProps {
   user: User;
   onLogout: () => void;
   onViewRecord: (record: CargoRecord) => void;
-  records: CargoRecord[];
-  onCreateRecord: (data: { barcodeNumber: string; exitNumber: string; carrierCompany: string; senderCompany: string; description: string; photos?: string[] }) => void;
 }
 
-export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user, onLogout, onViewRecord, records, onCreateRecord }) => {
+export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user, onLogout, onViewRecord }) => {
+  const { records, addRecord, updateRecord, updateRecordStatus } = useRecords();
   const [showForm, setShowForm] = useState(false);
+  const [statusUpdateRecord, setStatusUpdateRecord] = useState<CargoRecord | null>(null);
   const [formData, setFormData] = useState({
     barcodeNumber: '',
     exitNumber: '',
-    carrierCompany: '',
+    carrierCompany: 'ptt' as 'ptt' | 'aras' | 'surat' | 'yurtici' | 'verar',
     senderCompany: '',
+    recipientName: '',
     description: '',
   });
-  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+  const [statusFormData, setStatusFormData] = useState({
+    status: 'open' as RecordStatus,
+    resolutionNote: '',
+    paymentNote: '',
+    rejectionReason: '',
+  });
+  const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const userRecords = records.filter(record => record.createdBy === user.id);
+  
+  const filteredUserRecords = userRecords.filter(record => {
+    if (searchTerm === '') return true;
+    return (
+      record.barcodeNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      record.exitNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      record.senderCompany.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      record.recipientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      record.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
+  
+  // Debug: Kayıt sayısını kontrol et
+  console.log('StaffDashboard: Toplam kayıt sayısı:', records.length);
+  console.log('StaffDashboard: Kullanıcı kayıtları:', userRecords.length);
 
-  const getCarrierCompanyLabel = (carrierCompany: string) => {
-    const company = CARRIER_COMPANIES.find(c => c.value === carrierCompany);
-    return company ? company.label : carrierCompany;
+  const getStatusColor = (status: RecordStatus) => {
+    switch (status) {
+      case 'open': return 'bg-orange-100 text-orange-800 border-orange-200';
+      case 'in_progress': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'resolved': return 'bg-green-100 text-green-800 border-green-200';
+      case 'paid': return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+      case 'rejected': return 'bg-red-100 text-red-800 border-red-200';
+    }
+  };
+
+  const getStatusText = (status: RecordStatus) => {
+    switch (status) {
+      case 'open': return 'Yeni Kayıt';
+      case 'in_progress': return 'İşlemde';
+      case 'resolved': return 'Çözüldü';
+      case 'paid': return 'Ödendi';
+      case 'rejected': return 'Reddedildi';
+    }
+  };
+
+  // Çalışan panelinde durum değiştirilebilir mi kontrol et
+  const canChangeStatus = (status: RecordStatus) => {
+    // Sadece 'open' ve 'in_progress' durumlarında değişiklik yapılabilir
+    return status === 'open' || status === 'in_progress';
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onCreateRecord({
+    
+    // Seçilen fotoğrafları URL'lere çevir
+    const photoUrls = selectedPhotos.map(photo => URL.createObjectURL(photo));
+
+    // Yeni kayıt oluştur
+    const newRecord: CargoRecord = {
+      id: Date.now().toString(), // Basit ID oluşturma
       barcodeNumber: formData.barcodeNumber,
       exitNumber: formData.exitNumber,
       carrierCompany: formData.carrierCompany,
       senderCompany: formData.senderCompany,
+      recipientName: formData.recipientName,
       description: formData.description,
-      photos: photoPreviews,
-    });
+      photos: photoUrls, // Seçilen fotoğrafların URL'leri
+      status: 'open', // Varsayılan durum
+      createdBy: user.id,
+      createdByName: user.name,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    // Context'e yeni kaydı ekle
+    addRecord(newRecord);
+    
+    console.log('Yeni kayıt eklendi:', newRecord);
+    console.log('Toplam kayıt sayısı:', records.length + 1);
+    
     setShowForm(false);
-    setFormData({ barcodeNumber: '', exitNumber: '', carrierCompany: '', senderCompany: '', description: '' });
-    setPhotoPreviews([]);
+    setFormData({ 
+      barcodeNumber: '', 
+      exitNumber: '', 
+      carrierCompany: 'ptt', 
+      senderCompany: '', 
+      recipientName: '',
+      description: '' 
+    });
+    setSelectedPhotos([]);
   };
 
-  const handleFilesSelected = async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
-    const readers = Array.from(files).map(file => new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = () => reject(reader.error);
-      reader.readAsDataURL(file);
-    }));
-    const results = await Promise.all(readers);
-    setPhotoPreviews(prev => [...prev, ...results]);
+  const handleStatusUpdateClick = (record: CargoRecord) => {
+    setStatusUpdateRecord(record);
+    setStatusFormData({
+      status: record.status,
+      resolutionNote: record.resolutionNote || '',
+      paymentNote: record.paymentNote || '',
+      rejectionReason: record.rejectionReason || '',
+    });
+  };
+
+  const handleStatusUpdateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (statusUpdateRecord) {
+      try {
+        await updateRecordStatus(statusUpdateRecord.id, {
+          status: statusFormData.status,
+          resolutionNote: statusFormData.resolutionNote,
+          paymentNote: statusFormData.paymentNote,
+          rejectionReason: statusFormData.rejectionReason,
+          updatedBy: user.id,
+          updatedByName: user.name,
+        });
+        setStatusUpdateRecord(null);
+        console.log('Durum güncellendi:', statusUpdateRecord.id);
+      } catch (error) {
+        console.error('Durum güncellenirken hata:', error);
+      }
+    }
+  };
+
+  const handleStatusUpdateCancel = () => {
+    setStatusUpdateRecord(null);
+    setStatusFormData({
+      status: 'open',
+      resolutionNote: '',
+      paymentNote: '',
+      rejectionReason: '',
+    });
   };
 
   return (
@@ -101,27 +200,31 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user, onLogout, 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Barkod Numarası
+                    Taşıyıcı Firma (Kargo Şirketi) *
                   </label>
-                  <input
-                    type="text"
-                    value={formData.barcodeNumber}
-                    onChange={(e) => setFormData({ ...formData, barcodeNumber: e.target.value })}
+                  <select
+                    value={formData.carrierCompany}
+                    onChange={(e) => setFormData({ ...formData, carrierCompany: e.target.value as typeof formData.carrierCompany })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    placeholder="1234567890123"
                     required
-                  />
+                  >
+                    {CARRIER_COMPANIES.map(company => (
+                      <option key={company.value} value={company.value}>
+                        {company.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Çıkış Numarası
+                    Gönderici Firma *
                   </label>
                   <input
                     type="text"
-                    value={formData.exitNumber}
-                    onChange={(e) => setFormData({ ...formData, exitNumber: e.target.value })}
+                    value={formData.senderCompany}
+                    onChange={(e) => setFormData({ ...formData, senderCompany: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    placeholder="EX2024001234"
+                    placeholder="Firma adı giriniz"
                     required
                   />
                 </div>
@@ -130,74 +233,134 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user, onLogout, 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Taşıyıcı Firma
-                  </label>
-                  <select
-                    value={formData.carrierCompany}
-                    onChange={(e) => setFormData({ ...formData, carrierCompany: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    required
-                  >
-                    <option value="">Seçiniz</option>
-                    {CARRIER_COMPANIES.map(company => (
-                      <option key={company.value} value={company.value}>{company.label}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Gönderici Firma
+                    Alıcı Adı Soyadı *
                   </label>
                   <input
                     type="text"
-                    value={formData.senderCompany}
-                    onChange={(e) => setFormData({ ...formData, senderCompany: e.target.value })}
+                    value={formData.recipientName}
+                    onChange={(e) => setFormData({ ...formData, recipientName: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    placeholder="Firma Adı"
+                    placeholder="Alıcı adı soyadı giriniz"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Barkod Numarası *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.barcodeNumber}
+                    onChange={(e) => setFormData({ ...formData, barcodeNumber: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    placeholder="Barkod numarası giriniz"
                     required
                   />
                 </div>
               </div>
               
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Açıklama
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                  placeholder="Sorun detaylarını açıklayın..."
-                  required
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Çıkış Numarası *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.exitNumber}
+                    onChange={(e) => setFormData({ ...formData, exitNumber: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    placeholder="Çıkış numarası giriniz"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Açıklama
+                  </label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    placeholder="Sorun detaylarını açıklayın..."
+                  />
+                </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Fotoğraf Ekle
                 </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                <div 
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors cursor-pointer"
+                  onClick={() => document.getElementById('photo-upload')?.click()}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.currentTarget.classList.add('border-teal-400', 'bg-teal-50');
+                  }}
+                  onDragLeave={(e) => {
+                    e.preventDefault();
+                    e.currentTarget.classList.remove('border-teal-400', 'bg-teal-50');
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    e.currentTarget.classList.remove('border-teal-400', 'bg-teal-50');
+                    const files = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
+                    if (files.length > 0) {
+                      setSelectedPhotos(prev => [...prev, ...files]);
+                    }
+                  }}
+                >
                   <Camera className="mx-auto h-12 w-12 text-gray-400" />
                   <p className="mt-2 text-sm text-gray-600">
                     Fotoğraf yüklemek için tıklayın veya sürükleyin
                   </p>
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={(e) => handleFilesSelected(e.target.files)}
-                    className="mt-3 block w-full text-sm text-gray-600"
+                  <input 
+                    id="photo-upload"
+                    type="file" 
+                    multiple 
+                    accept="image/*" 
+                    className="hidden"
+                    onChange={(e) => {
+                      if (e.target.files) {
+                        const files = Array.from(e.target.files);
+                        setSelectedPhotos(prev => [...prev, ...files]);
+                        console.log('Seçilen dosyalar:', files);
+                      }
+                    }}
                   />
                 </div>
-                {photoPreviews.length > 0 && (
-                  <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    {photoPreviews.map((src, idx) => (
-                      <img key={idx} src={src} alt={`Önizleme ${idx + 1}`} className="w-full h-24 object-cover rounded" />
+              </div>
+
+              {/* Seçilen Fotoğraflar */}
+              {selectedPhotos.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Seçilen Fotoğraflar ({selectedPhotos.length})
+                  </label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {selectedPhotos.map((photo, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={URL.createObjectURL(photo)}
+                          alt={`Seçilen fotoğraf ${index + 1}`}
+                          className="w-full h-24 object-cover rounded-lg border"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPhotos(prev => prev.filter((_, i) => i !== index))}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                        >
+                          ×
+                        </button>
+                        <p className="text-xs text-gray-500 mt-1 truncate">
+                          {photo.name}
+                        </p>
+                      </div>
                     ))}
                   </div>
-                )}
-              </div>
+                </div>
+              )}
 
               <div className="flex space-x-4">
                 <button
@@ -220,16 +383,30 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user, onLogout, 
 
         {/* Records List */}
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-gray-900">Kayıtlarım ({userRecords.length})</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900">Kayıtlarım ({filteredUserRecords.length})</h2>
+            <div className="relative w-64">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                placeholder="Kayıtlarımda ara..."
+              />
+            </div>
+          </div>
           
-          {userRecords.length === 0 ? (
+          {filteredUserRecords.length === 0 ? (
             <div className="bg-white rounded-xl shadow-sm border p-8 text-center">
               <FileText className="mx-auto h-16 w-16 text-gray-400 mb-4" />
-              <p className="text-gray-600">Henüz kayıt bulunmuyor.</p>
+              <p className="text-gray-600">
+                {userRecords.length === 0 ? 'Henüz kayıt bulunmuyor.' : 'Arama kriterlerinize uygun kayıt bulunamadı.'}
+              </p>
             </div>
           ) : (
             <div className="grid gap-4">
-              {userRecords.map((record) => (
+              {filteredUserRecords.map((record) => (
                 <div
                   key={record.id}
                   onClick={() => onViewRecord(record)}
@@ -238,18 +415,51 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user, onLogout, 
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-2">
-                        <h3 className="font-medium text-gray-900">{record.barcodeNumber}</h3>
-                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
-                          {record.exitNumber}
+                        <h3 className="font-medium text-gray-900">
+                          Barkod: {record.barcodeNumber}
+                        </h3>
+                        <span className="text-xs text-gray-500">
+                          Çıkış No: {record.exitNumber}
                         </span>
                       </div>
-                      <div className="flex items-center space-x-4 mb-2 text-sm text-gray-600">
-                        <span><strong>Taşıyıcı:</strong> {getCarrierCompanyLabel(record.carrierCompany)}</span>
-                        <span><strong>Gönderici:</strong> {record.senderCompany}</span>
+                      <div className="flex items-center space-x-2 mb-2">
+                        <span className="text-sm text-gray-600">
+                          Taşıyıcı: {CARRIER_COMPANIES.find(c => c.value === record.carrierCompany)?.label}
+                        </span>
+                        <span className="text-gray-400">•</span>
+                        <span className="text-sm text-gray-600">
+                          Gönderici: {record.senderCompany}
+                        </span>
                       </div>
-                      <p className="text-gray-600 text-sm line-clamp-2 mb-2">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <span className="text-sm text-gray-600">
+                          Alıcı: {record.recipientName}
+                        </span>
+                      </div>
+                      <div className="text-gray-600 text-sm line-clamp-2 mb-2 whitespace-pre-line">
                         {record.description}
-                      </p>
+                      </div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(record.status)}`}>
+                          {getStatusText(record.status)}
+                        </span>
+                        {canChangeStatus(record.status) && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleStatusUpdateClick(record);
+                            }}
+                            className="text-purple-600 hover:text-purple-900 text-xs font-medium"
+                          >
+                            Durum Güncelle
+                          </button>
+                        )}
+                        {!canChangeStatus(record.status) && (
+                          <span className="text-gray-400 text-xs font-medium">
+                            Durum Değiştirilemez
+                          </span>
+                        )}
+                      </div>
                       <div className="flex items-center text-xs text-gray-500 space-x-4">
                         <div className="flex items-center">
                           <Calendar className="w-4 h-4 mr-1" />
@@ -270,6 +480,116 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user, onLogout, 
           )}
         </div>
       </div>
+
+      {/* Durum Güncelleme Modalı */}
+      {statusUpdateRecord && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b">
+              <h2 className="text-xl font-semibold text-gray-900">Durum Güncelle</h2>
+              <button
+                onClick={handleStatusUpdateCancel}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleStatusUpdateSubmit} className="p-6 space-y-6">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-medium text-gray-900 mb-2">Kayıt Bilgileri</h3>
+                <p className="text-sm text-gray-600">
+                  <strong>Barkod:</strong> {statusUpdateRecord.barcodeNumber} | 
+                  <strong> Çıkış No:</strong> {statusUpdateRecord.exitNumber} | 
+                  <strong> Firma:</strong> {statusUpdateRecord.senderCompany}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Durum *
+                </label>
+                <select
+                  value={statusFormData.status}
+                  onChange={(e) => setStatusFormData({ ...statusFormData, status: e.target.value as RecordStatus })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  required
+                >
+                  <option value="open">Yeni Kayıt</option>
+                  <option value="in_progress">İşlemde</option>
+                  <option value="resolved">Çözüldü</option>
+                  <option value="paid">Ödendi</option>
+                  <option value="rejected">Reddedildi</option>
+                </select>
+              </div>
+
+              {statusFormData.status === 'resolved' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Çözülme Sebebi *
+                  </label>
+                  <textarea
+                    value={statusFormData.resolutionNote}
+                    onChange={(e) => setStatusFormData({ ...statusFormData, resolutionNote: e.target.value })}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    placeholder="Sorunun nasıl çözüldüğünü açıklayın..."
+                    required
+                  />
+                </div>
+              )}
+
+              {statusFormData.status === 'paid' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Ödeme Açıklaması *
+                  </label>
+                  <textarea
+                    value={statusFormData.paymentNote}
+                    onChange={(e) => setStatusFormData({ ...statusFormData, paymentNote: e.target.value })}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    placeholder="Ödeme detaylarını açıklayın (örn: 1000 TL ödendi, banka transferi ile...)"
+                    required
+                  />
+                </div>
+              )}
+
+              {statusFormData.status === 'rejected' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Reddedilme Sebebi *
+                  </label>
+                  <textarea
+                    value={statusFormData.rejectionReason}
+                    onChange={(e) => setStatusFormData({ ...statusFormData, rejectionReason: e.target.value })}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    placeholder="Neden reddedildiğini açıklayın..."
+                    required
+                  />
+                </div>
+              )}
+
+              <div className="flex space-x-4 pt-4">
+                <button
+                  type="submit"
+                  className="flex-1 bg-teal-500 hover:bg-teal-600 text-white py-2 px-4 rounded-lg transition-colors"
+                >
+                  Durumu Güncelle
+                </button>
+                <button
+                  type="button"
+                  onClick={handleStatusUpdateCancel}
+                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-lg transition-colors"
+                >
+                  İptal
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

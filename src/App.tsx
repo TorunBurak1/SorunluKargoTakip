@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Login } from './components/Login';
 import { StaffDashboard } from './components/StaffDashboard';
 import { AdminDashboard } from './components/AdminDashboard';
 import { RecordDetail } from './components/RecordDetail';
-import { apiService, User, CargoRecord } from './services/api';
+import { TablePage } from './pages/TablePage';
+import { RecordsProvider } from './contexts/RecordsContext';
+import { UsersProvider } from './contexts/UsersContext';
+import { mockUsers } from './data/mockData';
+import { User, CargoRecord } from './types';
+import { apiService } from './services/api';
 
 type ViewType = 'login' | 'staff-dashboard' | 'admin-dashboard' | 'record-detail';
 
@@ -11,244 +17,277 @@ function App() {
   const [currentView, setCurrentView] = useState<ViewType>('login');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<CargoRecord | null>(null);
-  const [records, setRecords] = useState<CargoRecord[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Uygulama başlangıcında localStorage'dan kullanıcı bilgilerini yükle
+  // Sayfa yüklendiğinde otomatik giriş kontrolü
+  // sessionStorage kullanarak her sekme için ayrı oturum sağlıyoruz
   useEffect(() => {
-    const initializeApp = async () => {
-      try {
-        const savedUser = localStorage.getItem('currentUser');
-        const savedView = localStorage.getItem('currentView') as ViewType;
-        
-        if (savedUser) {
-          const user = JSON.parse(savedUser);
-          setCurrentUser(user);
-          
-          // Kullanıcı bilgilerini doğrula
-          try {
-            await apiService.getUser(user.id);
-            setCurrentView(savedView || (user.role === 'admin' ? 'admin-dashboard' : 'staff-dashboard'));
-          } catch (err) {
-            // Kullanıcı bilgileri geçersizse localStorage'ı temizle
-            localStorage.removeItem('currentUser');
-            localStorage.removeItem('currentView');
-            setCurrentView('login');
+    try {
+      // Önce admin oturumunu kontrol et
+      const adminUser = sessionStorage.getItem('adminUser');
+      const adminView = sessionStorage.getItem('adminView') as ViewType;
+      
+      // Sonra staff oturumunu kontrol et
+      const staffUser = sessionStorage.getItem('staffUser');
+      const staffView = sessionStorage.getItem('staffView') as ViewType;
+      
+      // Admin oturumu varsa onu yükle
+      if (adminUser && adminView) {
+        try {
+          const user = JSON.parse(adminUser);
+          // Kullanıcı geçerli mi kontrol et
+          if (user && user.id && user.name && user.role === 'admin') {
+            setCurrentUser(user);
+            setCurrentView(adminView);
+            
+            // Eğer record-detail view'ındaysa selectedRecord'u yükle
+            if (adminView === 'record-detail') {
+              const adminSelectedRecord = sessionStorage.getItem('adminSelectedRecord');
+              if (adminSelectedRecord) {
+                try {
+                  const record = JSON.parse(adminSelectedRecord);
+                  setSelectedRecord(record);
+                  console.log('Admin record-detail view yüklendi:', record.id);
+                } catch (error) {
+                  console.error('Admin selectedRecord yükleme hatası:', error);
+                  setCurrentView('admin-dashboard');
+                  sessionStorage.setItem('adminView', 'admin-dashboard');
+                }
+              } else {
+                setCurrentView('admin-dashboard');
+                sessionStorage.setItem('adminView', 'admin-dashboard');
+              }
+            }
+            console.log('Admin oturumu yüklendi:', user.name, adminView);
+          } else {
+            throw new Error('Geçersiz admin kullanıcı verisi');
           }
+        } catch (error) {
+          console.error('Admin oturum yükleme hatası:', error);
+          sessionStorage.removeItem('adminUser');
+          sessionStorage.removeItem('adminView');
+          sessionStorage.removeItem('adminSelectedRecord');
+          setCurrentView('login');
         }
-      } catch (err) {
-        console.error('Uygulama başlatma hatası:', err);
-        setCurrentView('login');
-      } finally {
-        setIsInitialized(true);
       }
-    };
-
-    initializeApp();
+      // Admin oturumu yoksa staff oturumunu kontrol et
+      else if (staffUser && staffView) {
+        try {
+          const user = JSON.parse(staffUser);
+          // Kullanıcı geçerli mi kontrol et
+          if (user && user.id && user.name && user.role === 'staff') {
+            setCurrentUser(user);
+            setCurrentView(staffView);
+            
+            // Eğer record-detail view'ındaysa selectedRecord'u yükle
+            if (staffView === 'record-detail') {
+              const staffSelectedRecord = sessionStorage.getItem('staffSelectedRecord');
+              if (staffSelectedRecord) {
+                try {
+                  const record = JSON.parse(staffSelectedRecord);
+                  setSelectedRecord(record);
+                  console.log('Staff record-detail view yüklendi:', record.id);
+                } catch (error) {
+                  console.error('Staff selectedRecord yükleme hatası:', error);
+                  setCurrentView('staff-dashboard');
+                  sessionStorage.setItem('staffView', 'staff-dashboard');
+                }
+              } else {
+                setCurrentView('staff-dashboard');
+                sessionStorage.setItem('staffView', 'staff-dashboard');
+              }
+            }
+            console.log('Staff oturumu yüklendi:', user.name, staffView);
+          } else {
+            throw new Error('Geçersiz staff kullanıcı verisi');
+          }
+        } catch (error) {
+          console.error('Staff oturum yükleme hatası:', error);
+          sessionStorage.removeItem('staffUser');
+          sessionStorage.removeItem('staffView');
+          sessionStorage.removeItem('staffSelectedRecord');
+          setCurrentView('login');
+        }
+      } else {
+        // Oturum yoksa login sayfasına yönlendir
+        setCurrentView('login');
+        setCurrentUser(null);
+      }
+    } catch (error) {
+      console.error('Oturum yükleme genel hatası:', error);
+      // Tüm sessionStorage'ı temizle
+      sessionStorage.removeItem('adminUser');
+      sessionStorage.removeItem('adminView');
+      sessionStorage.removeItem('staffUser');
+      sessionStorage.removeItem('staffView');
+      setCurrentView('login');
+      setCurrentUser(null);
+    }
+    
+    setIsLoading(false);
   }, []);
 
-  // Verileri yükle
-  useEffect(() => {
-    const loadData = async () => {
-      if (currentUser) {
-        setLoading(true);
-        setError(null);
-        try {
-          const [recordsData, usersData] = await Promise.all([
-            apiService.getCargoRecords(),
-            apiService.getUsers()
-          ]);
-          setRecords(recordsData);
-          setUsers(usersData);
-        } catch (err) {
-          setError('Veriler yüklenirken hata oluştu: ' + (err as Error).message);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadData();
-  }, [currentUser]);
-
   const handleLogin = async (email: string, password: string) => {
-    setLoading(true);
-    setError(null);
-    
     try {
+      // API servisini kullanarak giriş yap
       const user = await apiService.login(email, password);
-      setCurrentUser(user);
       
-      const view = user.role === 'admin' ? 'admin-dashboard' : 'staff-dashboard';
-      setCurrentView(view);
-      
-      // localStorage'a kaydet
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      localStorage.setItem('currentView', view);
-    } catch (err) {
-      setError('Giriş yapılırken hata oluştu: ' + (err as Error).message);
-    } finally {
-      setLoading(false);
+      if (user) {
+        // Kullanıcı rolüne göre sessionStorage key'lerini belirle
+        const userKey = user.role === 'admin' ? 'adminUser' : 'staffUser';
+        const viewKey = user.role === 'admin' ? 'adminView' : 'staffView';
+        
+        // Farklı rolde kullanıcı giriş yapıyorsa diğer rolün oturumunu temizle
+        if (user.role === 'admin') {
+          // Admin giriş yapıyorsa staff oturumunu temizle
+          const staffUser = sessionStorage.getItem('staffUser');
+          if (staffUser) {
+            const staffUserData = JSON.parse(staffUser);
+            console.log('Admin giriş yapıyor, staff oturumu temizleniyor:', staffUserData.name);
+            sessionStorage.removeItem('staffUser');
+            sessionStorage.removeItem('staffView');
+          }
+        } else {
+          // Staff giriş yapıyorsa admin oturumunu temizle
+          const adminUser = sessionStorage.getItem('adminUser');
+          if (adminUser) {
+            const adminUserData = JSON.parse(adminUser);
+            console.log('Staff giriş yapıyor, admin oturumu temizleniyor:', adminUserData.name);
+            sessionStorage.removeItem('adminUser');
+            sessionStorage.removeItem('adminView');
+          }
+        }
+        
+        // Yeni kullanıcıyı kaydet
+        setCurrentUser(user);
+        sessionStorage.setItem(userKey, JSON.stringify(user));
+        
+        // View'ı belirle ve kaydet
+        const view = user.role === 'admin' ? 'admin-dashboard' : 'staff-dashboard';
+        setCurrentView(view);
+        sessionStorage.setItem(viewKey, view);
+        
+        console.log('Giriş yapıldı:', user.name, user.role, view);
+      }
+    } catch (error: any) {
+      console.error('Giriş hatası:', error);
+      alert(error.message || 'Geçersiz e-posta veya şifre!');
     }
   };
 
   const handleLogout = () => {
+    console.log('Çıkış yapıldı:', currentUser?.name, currentUser?.role);
+    
+    // Kullanıcı rolüne göre doğru sessionStorage key'lerini temizle
+    if (currentUser?.role === 'admin') {
+      sessionStorage.removeItem('adminUser');
+      sessionStorage.removeItem('adminView');
+      sessionStorage.removeItem('adminSelectedRecord');
+    } else if (currentUser?.role === 'staff') {
+      sessionStorage.removeItem('staffUser');
+      sessionStorage.removeItem('staffView');
+      sessionStorage.removeItem('staffSelectedRecord');
+    }
+    
     setCurrentUser(null);
     setCurrentView('login');
     setSelectedRecord(null);
-    
-    // localStorage'ı temizle
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('currentView');
   };
 
   const handleViewRecord = (record: CargoRecord) => {
     setSelectedRecord(record);
     setCurrentView('record-detail');
-    localStorage.setItem('currentView', 'record-detail');
+    
+    // Kullanıcı rolüne göre doğru sessionStorage key'ini güncelle
+    const viewKey = currentUser?.role === 'admin' ? 'adminView' : 'staffView';
+    const recordKey = currentUser?.role === 'admin' ? 'adminSelectedRecord' : 'staffSelectedRecord';
+    sessionStorage.setItem(viewKey, 'record-detail');
+    sessionStorage.setItem(recordKey, JSON.stringify(record));
   };
 
   const handleBackFromRecord = () => {
     setSelectedRecord(null);
     const view = currentUser?.role === 'admin' ? 'admin-dashboard' : 'staff-dashboard';
     setCurrentView(view);
-    localStorage.setItem('currentView', view);
+    
+    // Kullanıcı rolüne göre doğru sessionStorage key'ini güncelle
+    const viewKey = currentUser?.role === 'admin' ? 'adminView' : 'staffView';
+    const recordKey = currentUser?.role === 'admin' ? 'adminSelectedRecord' : 'staffSelectedRecord';
+    sessionStorage.setItem(viewKey, view);
+    sessionStorage.removeItem(recordKey);
   };
 
-  const createRecord = async (data: { barcodeNumber: string; exitNumber: string; carrierCompany: string; senderCompany: string; description: string; photos?: string[] }) => {
-    if (!currentUser) return;
-    
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const newRecord = await apiService.createCargoRecord({
-        ...data,
-        createdBy: currentUser.id,
-        createdByName: currentUser.name,
-      });
-      setRecords(prev => [newRecord, ...prev]);
-    } catch (err) {
-      setError('Kayıt oluşturulurken hata oluştu: ' + (err as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateRecord = async (id: string, updates: Partial<Omit<CargoRecord, 'id' | 'createdBy' | 'createdByName' | 'createdAt'>>) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const updatedRecord = await apiService.updateCargoRecord(id, updates);
-      setRecords(prev => prev.map(r => r.id === id ? updatedRecord : r));
-      if (selectedRecord && selectedRecord.id === id) {
-        setSelectedRecord(updatedRecord);
-      }
-    } catch (err) {
-      setError('Kayıt güncellenirken hata oluştu: ' + (err as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const deleteRecord = async (id: string) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      await apiService.deleteCargoRecord(id);
-      setRecords(prev => prev.filter(r => r.id !== id));
-      if (selectedRecord && selectedRecord.id === id) {
-        setSelectedRecord(null);
-        if (currentUser?.role === 'admin') setCurrentView('admin-dashboard');
-        else setCurrentView('staff-dashboard');
-      }
-    } catch (err) {
-      setError('Kayıt silinirken hata oluştu: ' + (err as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Uygulama henüz başlatılmadıysa loading göster
-  if (!isInitialized) {
+  // Loading durumunda spinner göster
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white rounded-lg p-8 flex items-center space-x-4 shadow-lg">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500"></div>
-          <span className="text-lg font-medium text-gray-700">Uygulama başlatılıyor...</span>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Yükleniyor...</p>
+          <button 
+            onClick={() => {
+              sessionStorage.clear();
+              window.location.reload();
+            }}
+            className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+          >
+            SessionStorage Temizle ve Yenile
+          </button>
+          <div className="mt-4 text-sm text-gray-600">
+            <p><strong>Backend:</strong> http://localhost:3001</p>
+            <p><strong>Frontend:</strong> http://localhost:5173</p>
+            <p><strong>Demo Hesaplar:</strong></p>
+            <p>• Yönetici: mehmet@kargo.com / 123456</p>
+            <p>• Çalışan: ahmet@kargo.com / 123456</p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="App">
-      {/* Error Message */}
-      {error && (
-        <div className="fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
-          <div className="flex items-center justify-between">
-            <span>{error}</span>
-            <button
-              onClick={() => setError(null)}
-              className="ml-4 text-white hover:text-gray-200"
-            >
-              ×
-            </button>
+    <Router>
+      <RecordsProvider>
+        <UsersProvider>
+          <div className="App">
+            <Routes>
+              {/* Tablo sayfası - herkese açık */}
+              <Route path="/tablo" element={<TablePage />} />
+              
+              {/* Ana uygulama rotaları */}
+              <Route path="/" element={
+                !currentUser || currentView === 'login' ? (
+                  <Login onLogin={handleLogin} />
+                ) : currentView === 'staff-dashboard' && currentUser ? (
+                  <StaffDashboard
+                    user={currentUser}
+                    onLogout={handleLogout}
+                    onViewRecord={handleViewRecord}
+                  />
+                ) : currentView === 'admin-dashboard' && currentUser ? (
+                  <AdminDashboard
+                    user={currentUser}
+                    onLogout={handleLogout}
+                    onViewRecord={handleViewRecord}
+                  />
+                ) : currentView === 'record-detail' && selectedRecord && currentUser ? (
+                  <RecordDetail
+                    record={selectedRecord}
+                    onBack={handleBackFromRecord}
+                    isAdmin={currentUser.role === 'admin'}
+                  />
+                ) : (
+                  <Login onLogin={handleLogin} />
+                )
+              } />
+              
+              {/* Diğer tüm rotalar ana sayfaya yönlendir */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
           </div>
-        </div>
-      )}
-
-      {/* Loading Overlay */}
-      {loading && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 flex items-center space-x-3">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-500"></div>
-            <span>Yükleniyor...</span>
-          </div>
-        </div>
-      )}
-
-      {currentView === 'login' && (
-        <Login onLogin={handleLogin} loading={loading} />
-      )}
-
-      {currentView === 'staff-dashboard' && currentUser && (
-        <StaffDashboard
-          user={currentUser}
-          onLogout={handleLogout}
-          onViewRecord={handleViewRecord}
-          records={records}
-          onCreateRecord={createRecord}
-        />
-      )}
-
-      {currentView === 'admin-dashboard' && currentUser && (
-        <AdminDashboard
-          user={currentUser}
-          onLogout={handleLogout}
-          onViewRecord={handleViewRecord}
-          records={records}
-          users={users}
-          onUpdateRecord={updateRecord}
-          onDeleteRecord={deleteRecord}
-        />
-      )}
-
-      {currentView === 'record-detail' && selectedRecord && currentUser && (
-        <RecordDetail
-          record={selectedRecord}
-          onBack={handleBackFromRecord}
-          isAdmin={currentUser.role === 'admin'}
-          onUpdateRecord={updateRecord}
-          onDeleteRecord={deleteRecord}
-        />
-      )}
-    </div>
+        </UsersProvider>
+      </RecordsProvider>
+    </Router>
   );
 }
 

@@ -1,3 +1,10 @@
+#!/usr/bin/env node
+
+/**
+ * Kalıcı Veritabanı ile Kargo API Sunucusu
+ * Bu script SQLite veritabanını kullanır ve veriler kalıcı olarak saklanır
+ */
+
 const express = require('express');
 const cors = require('cors');
 const { initDatabase, dbManager, initializeDatabase, getDatabase } = require('./database');
@@ -93,7 +100,7 @@ app.get('/api/all-data', (req, res) => {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Kargo API çalışıyor' });
+  res.json({ status: 'OK', message: 'Kargo API çalışıyor (Kalıcı SQLite)' });
 });
 
 // Veritabanı durumu endpoint'i
@@ -105,7 +112,9 @@ app.get('/api/database/status', async (req, res) => {
       status: 'OK',
       connected: true,
       stats: stats,
-      message: 'Veritabanı bağlantısı aktif'
+      message: 'Veritabanı bağlantısı aktif (Kalıcı SQLite)',
+      databaseType: 'SQLite',
+      persistent: true
     });
   } catch (error) {
     res.status(500).json({
@@ -131,7 +140,7 @@ app.use('*', (req, res) => {
 // Veritabanını başlat ve sunucuyu çalıştır
 const startServer = async () => {
   try {
-    console.log('🔄 Veritabanı başlatılıyor...');
+    console.log('🔄 Kalıcı SQLite veritabanı başlatılıyor...');
     await initDatabase();
     
     console.log('🔄 Veritabanı bağlantısı kontrol ediliyor...');
@@ -148,15 +157,17 @@ const startServer = async () => {
     }
     
     app.listen(PORT, () => {
-      console.log('\n🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)');
-      console.log('='.repeat(50));
+      console.log('\n🚀 KARGO API SUNUCUSU BAŞLATILDI (KALICI SQLITE)');
+      console.log('='.repeat(60));
       console.log(`🌐 Sunucu adresi: http://localhost:${PORT}`);
       console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
       console.log(`🗄️  Veritabanı durumu: http://localhost:${PORT}/api/database/status`);
       console.log(`📋 Tüm veriler: http://localhost:${PORT}/api/all-data`);
-      console.log('='.repeat(50));
+      console.log('='.repeat(60));
       console.log('✅ Sunucu hazır ve çalışıyor!');
       console.log('💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor');
+      console.log('🔄 Program kapatılıp açıldığında veriler korunacak');
+      console.log('='.repeat(60));
     });
   } catch (err) {
     console.error('❌ Sunucu başlatma hatası:', err);
@@ -169,7 +180,8 @@ process.on('SIGINT', async () => {
   console.log('\n🛑 Sunucu kapatılıyor...');
   try {
     await dbManager.close();
-    console.log('✅ Veritabanı bağlantısı kapatıldı');
+    console.log('✅ Veritabanı bağlantısı güvenli şekilde kapatıldı');
+    console.log('💾 Veriler korundu');
   } catch (error) {
     console.error('❌ Veritabanı kapatma hatası:', error.message);
   }
@@ -180,7 +192,8 @@ process.on('SIGTERM', async () => {
   console.log('\n🛑 Sunucu kapatılıyor (SIGTERM)...');
   try {
     await dbManager.close();
-    console.log('✅ Veritabanı bağlantısı kapatıldı');
+    console.log('✅ Veritabanı bağlantısı güvenli şekilde kapatıldı');
+    console.log('💾 Veriler korundu');
   } catch (error) {
     console.error('❌ Veritabanı kapatma hatası:', error.message);
   }
@@ -189,4 +202,18 @@ process.on('SIGTERM', async () => {
 
 // Sunucuyu başlat
 startServer();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -59,3 +59,5 @@ db.all('SELECT * FROM cargo_records ORDER BY created_at DESC', [], (err, rows) =
     }
   });
 });
+
+

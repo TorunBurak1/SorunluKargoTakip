@@ -1,0 +1,772 @@
+2025-10-14T14:38:11: 🔄 Veritabanı başlatılıyor...
+2025-10-14T14:38:11: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-14T14:38:11: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T14:38:11: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-14T14:38:11: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T14:38:11: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-14T14:38:11: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-14T14:38:11: 👥 Kullanıcı sayısı: 3
+2025-10-14T14:38:11: 📦 Kargo kayıt sayısı: 4
+2025-10-14T14:38:11: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T14:38:11: 📊 Boyut: 24.00 KB
+2025-10-14T14:38:11: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-14T14:38:11: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-14T14:38:11: ==================================================
+2025-10-14T14:38:11: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-14T14:38:11: 📊 Health check: http://localhost:3001/api/health
+2025-10-14T14:38:11: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-14T14:38:11: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-14T14:38:11: ==================================================
+2025-10-14T14:38:11: ✅ Sunucu hazır ve çalışıyor!
+2025-10-14T14:38:11: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-14T15:05:10: Status update debug: {
+  status: 'in_progress',
+  resolutionNote: '',
+  paymentNote: '',
+  rejectionReason: '',
+  now: '2025-10-14T12:05:10.489Z'
+}
+2025-10-14T15:05:10: New note created: 
+
+[İşlemde - 2025-10-14T12:05:10.489Z] Durum güncellendi.
+2025-10-14T15:05:10: Updated description: Kargo alıcıya gitmemiş. geciktiği için iadesini istiyor.
+
+[İşlemde - 2025-10-14T12:05:10.489Z] Durum güncellendi.
+2025-10-14T15:05:26: Status update debug: {
+  status: 'paid',
+  resolutionNote: '',
+  paymentNote: 'İade bedeli firmaya ödendi',
+  rejectionReason: '',
+  now: '2025-10-14T12:05:26.438Z'
+}
+2025-10-14T15:05:26: New note created: 
+
+[Ödendi - 2025-10-14T12:05:26.438Z] İade bedeli firmaya ödendi
+2025-10-14T15:05:26: Updated description: Kargo alıcıya gitmemiş. geciktiği için iadesini istiyor.
+
+[İşlemde - 2025-10-14T12:05:10.489Z] Durum güncellendi.
+
+[Ödendi - 2025-10-14T12:05:26.438Z] İade bedeli firmaya ödendi
+2025-10-14T15:09:12: 🔄 Veritabanı başlatılıyor...
+2025-10-14T15:09:12: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-14T15:09:12: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T15:09:12: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-14T15:09:12: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T15:09:12: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-14T15:09:12: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-14T15:09:12: 👥 Kullanıcı sayısı: 3
+2025-10-14T15:09:12: 📦 Kargo kayıt sayısı: 5
+2025-10-14T15:09:12: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T15:09:12: 📊 Boyut: 24.00 KB
+2025-10-14T15:09:12: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-14T15:09:12: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-14T15:09:12: ==================================================
+2025-10-14T15:09:12: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-14T15:09:12: 📊 Health check: http://localhost:3001/api/health
+2025-10-14T15:09:12: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-14T15:09:12: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-14T15:09:12: ==================================================
+2025-10-14T15:09:12: ✅ Sunucu hazır ve çalışıyor!
+2025-10-14T15:09:12: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-14T15:17:31: 🔄 Veritabanı başlatılıyor...
+2025-10-14T15:17:31: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-14T15:17:31: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T15:17:31: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-14T15:17:31: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T15:17:31: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-14T15:17:31: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-14T15:17:31: 👥 Kullanıcı sayısı: 3
+2025-10-14T15:17:31: 📦 Kargo kayıt sayısı: 5
+2025-10-14T15:17:31: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T15:17:31: 📊 Boyut: 24.00 KB
+2025-10-14T15:17:31: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-14T15:17:31: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-14T15:17:31: ==================================================
+2025-10-14T15:17:31: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-14T15:17:31: 📊 Health check: http://localhost:3001/api/health
+2025-10-14T15:17:31: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-14T15:17:31: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-14T15:17:31: ==================================================
+2025-10-14T15:17:31: ✅ Sunucu hazır ve çalışıyor!
+2025-10-14T15:17:31: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-14T15:31:22: 🔄 Veritabanı başlatılıyor...
+2025-10-14T15:31:22: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-14T15:31:22: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T15:31:22: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-14T15:31:22: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T15:31:22: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-14T15:31:22: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-14T15:31:22: 👥 Kullanıcı sayısı: 3
+2025-10-14T15:31:22: 📦 Kargo kayıt sayısı: 5
+2025-10-14T15:31:22: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T15:31:22: 📊 Boyut: 24.00 KB
+2025-10-14T15:31:22: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-14T15:31:22: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-14T15:31:22: ==================================================
+2025-10-14T15:31:22: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-14T15:31:22: 📊 Health check: http://localhost:3001/api/health
+2025-10-14T15:31:22: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-14T15:31:22: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-14T15:31:22: ==================================================
+2025-10-14T15:31:22: ✅ Sunucu hazır ve çalışıyor!
+2025-10-14T15:31:22: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-14T15:32:01: 🔄 Veritabanı başlatılıyor...
+2025-10-14T15:32:01: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-14T15:32:01: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T15:32:01: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-14T15:32:01: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T15:32:01: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-14T15:32:01: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-14T15:32:01: 👥 Kullanıcı sayısı: 3
+2025-10-14T15:32:01: 📦 Kargo kayıt sayısı: 5
+2025-10-14T15:32:01: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T15:32:01: 📊 Boyut: 24.00 KB
+2025-10-14T15:32:01: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-14T15:32:01: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-14T15:32:01: ==================================================
+2025-10-14T15:32:01: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-14T15:32:01: 📊 Health check: http://localhost:3001/api/health
+2025-10-14T15:32:01: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-14T15:32:01: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-14T15:32:01: ==================================================
+2025-10-14T15:32:01: ✅ Sunucu hazır ve çalışıyor!
+2025-10-14T15:32:01: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-14T15:59:33: 🔄 Veritabanı başlatılıyor...
+2025-10-14T15:59:33: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-14T15:59:33: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T15:59:33: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-14T15:59:33: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T15:59:33: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-14T15:59:33: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-14T15:59:33: 👥 Kullanıcı sayısı: 3
+2025-10-14T15:59:33: 📦 Kargo kayıt sayısı: 5
+2025-10-14T15:59:33: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T15:59:33: 📊 Boyut: 24.00 KB
+2025-10-14T15:59:33: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-14T15:59:33: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-14T15:59:33: ==================================================
+2025-10-14T15:59:33: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-14T15:59:33: 📊 Health check: http://localhost:3001/api/health
+2025-10-14T15:59:33: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-14T15:59:33: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-14T15:59:33: ==================================================
+2025-10-14T15:59:33: ✅ Sunucu hazır ve çalışıyor!
+2025-10-14T15:59:33: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-14T16:13:33: 🔄 Veritabanı başlatılıyor...
+2025-10-14T16:13:33: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-14T16:13:33: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T16:13:33: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-14T16:13:33: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T16:13:33: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-14T16:13:33: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-14T16:13:33: 👥 Kullanıcı sayısı: 3
+2025-10-14T16:13:33: 📦 Kargo kayıt sayısı: 5
+2025-10-14T16:13:33: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T16:13:33: 📊 Boyut: 24.00 KB
+2025-10-14T16:13:33: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-14T16:13:33: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-14T16:13:33: ==================================================
+2025-10-14T16:13:33: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-14T16:13:33: 📊 Health check: http://localhost:3001/api/health
+2025-10-14T16:13:33: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-14T16:13:33: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-14T16:13:33: ==================================================
+2025-10-14T16:13:33: ✅ Sunucu hazır ve çalışıyor!
+2025-10-14T16:13:33: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-14T16:16:17: 🔄 Veritabanı başlatılıyor...
+2025-10-14T16:16:17: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-14T16:16:17: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T16:16:17: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-14T16:16:17: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T16:16:17: ✅ Mevcut kullanıcılar korunuyor (3 adet)
+2025-10-14T16:16:17: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-14T16:16:17: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-14T16:16:17: 👥 Kullanıcı sayısı: 3
+2025-10-14T16:16:17: 📦 Kargo kayıt sayısı: 5
+2025-10-14T16:16:17: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T16:16:17: 📊 Boyut: 24.00 KB
+2025-10-14T16:16:17: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-14T16:16:17: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-14T16:16:17: ==================================================
+2025-10-14T16:16:17: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-14T16:16:17: 📊 Health check: http://localhost:3001/api/health
+2025-10-14T16:16:17: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-14T16:16:17: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-14T16:16:17: ==================================================
+2025-10-14T16:16:17: ✅ Sunucu hazır ve çalışıyor!
+2025-10-14T16:16:17: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-14T16:16:29: 🔄 Veritabanı başlatılıyor...
+2025-10-14T16:16:29: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-14T16:16:29: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T16:16:29: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-14T16:16:29: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T16:16:29: ✅ Mevcut kullanıcılar korunuyor (3 adet)
+2025-10-14T16:16:29: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-14T16:16:29: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-14T16:16:29: 👥 Kullanıcı sayısı: 3
+2025-10-14T16:16:29: 📦 Kargo kayıt sayısı: 5
+2025-10-14T16:16:29: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-14T16:16:29: 📊 Boyut: 24.00 KB
+2025-10-14T16:16:29: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-14T16:16:29: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-14T16:16:29: ==================================================
+2025-10-14T16:16:29: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-14T16:16:29: 📊 Health check: http://localhost:3001/api/health
+2025-10-14T16:16:29: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-14T16:16:29: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-14T16:16:29: ==================================================
+2025-10-14T16:16:29: ✅ Sunucu hazır ve çalışıyor!
+2025-10-14T16:16:29: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-15T09:57:04: 🔄 Veritabanı başlatılıyor...
+2025-10-15T09:57:04: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-15T09:57:04: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-15T09:57:04: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-15T09:57:04: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-15T09:57:05: ✅ Mevcut kullanıcılar korunuyor (3 adet)
+2025-10-15T09:57:05: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-15T09:57:05: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-15T09:57:05: 👥 Kullanıcı sayısı: 3
+2025-10-15T09:57:05: 📦 Kargo kayıt sayısı: 5
+2025-10-15T09:57:05: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-15T09:57:05: 📊 Boyut: 24.00 KB
+2025-10-15T09:57:05: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-15T09:57:05: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-15T09:57:05: ==================================================
+2025-10-15T09:57:05: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-15T09:57:05: 📊 Health check: http://localhost:3001/api/health
+2025-10-15T09:57:05: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-15T09:57:05: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-15T09:57:05: ==================================================
+2025-10-15T09:57:05: ✅ Sunucu hazır ve çalışıyor!
+2025-10-15T09:57:05: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-16T09:38:38: 🔄 Veritabanı başlatılıyor...
+2025-10-16T09:38:38: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-16T09:38:38: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-16T09:38:38: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-16T09:38:38: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-16T09:38:38: ✅ Mevcut kullanıcılar korunuyor (3 adet)
+2025-10-16T09:38:38: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-16T09:38:38: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-16T09:38:38: 👥 Kullanıcı sayısı: 3
+2025-10-16T09:38:38: 📦 Kargo kayıt sayısı: 5
+2025-10-16T09:38:38: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-16T09:38:38: 📊 Boyut: 24.00 KB
+2025-10-16T09:38:38: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-16T09:38:38: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-16T09:38:38: ==================================================
+2025-10-16T09:38:38: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-16T09:38:38: 📊 Health check: http://localhost:3001/api/health
+2025-10-16T09:38:38: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-16T09:38:38: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-16T09:38:38: ==================================================
+2025-10-16T09:38:38: ✅ Sunucu hazır ve çalışıyor!
+2025-10-16T09:38:38: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-16T17:37:31: Status update debug: {
+  status: 'resolved',
+  resolutionNote: 'HALLETTİK',
+  paymentNote: '',
+  rejectionReason: '',
+  now: '2025-10-16T14:37:31.530Z'
+}
+2025-10-16T17:37:31: New note created: 
+
+[Çözüldü - 2025-10-16T14:37:31.530Z] HALLETTİK
+2025-10-16T17:37:31: Updated description: DENEME
+
+[Çözüldü - 2025-10-16T14:37:31.530Z] HALLETTİK
+2025-10-17T09:39:42: 🔄 Veritabanı başlatılıyor...
+2025-10-17T09:39:42: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-17T09:39:42: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-17T09:39:42: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-17T09:39:42: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-17T09:39:42: ✅ Mevcut kullanıcılar korunuyor (4 adet)
+2025-10-17T09:39:42: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-17T09:39:42: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-17T09:39:42: 👥 Kullanıcı sayısı: 4
+2025-10-17T09:39:42: 📦 Kargo kayıt sayısı: 1
+2025-10-17T09:39:42: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-17T09:39:42: 📊 Boyut: 24.00 KB
+2025-10-17T09:39:42: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-17T09:39:42: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-17T09:39:42: ==================================================
+2025-10-17T09:39:42: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-17T09:39:42: 📊 Health check: http://localhost:3001/api/health
+2025-10-17T09:39:42: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-17T09:39:42: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-17T09:39:42: ==================================================
+2025-10-17T09:39:42: ✅ Sunucu hazır ve çalışıyor!
+2025-10-17T09:39:42: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-18T10:28:35: 🔄 Veritabanı başlatılıyor...
+2025-10-18T10:28:35: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-18T10:28:35: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-18T10:28:36: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-18T10:28:36: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-18T10:28:36: ✅ Mevcut kullanıcılar korunuyor (4 adet)
+2025-10-18T10:28:36: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-18T10:28:36: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-18T10:28:36: 👥 Kullanıcı sayısı: 4
+2025-10-18T10:28:36: 📦 Kargo kayıt sayısı: 1
+2025-10-18T10:28:36: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-18T10:28:36: 📊 Boyut: 24.00 KB
+2025-10-18T10:28:36: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-18T10:28:36: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-18T10:28:36: ==================================================
+2025-10-18T10:28:36: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-18T10:28:36: 📊 Health check: http://localhost:3001/api/health
+2025-10-18T10:28:36: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-18T10:28:36: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-18T10:28:36: ==================================================
+2025-10-18T10:28:36: ✅ Sunucu hazır ve çalışıyor!
+2025-10-18T10:28:36: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-20T09:41:04: 🔄 Veritabanı başlatılıyor...
+2025-10-20T09:41:04: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-20T09:41:04: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-20T09:41:04: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-20T09:41:04: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-20T09:41:04: ✅ Mevcut kullanıcılar korunuyor (4 adet)
+2025-10-20T09:41:04: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-20T09:41:04: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-20T09:41:04: 👥 Kullanıcı sayısı: 4
+2025-10-20T09:41:04: 📦 Kargo kayıt sayısı: 1
+2025-10-20T09:41:04: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-20T09:41:04: 📊 Boyut: 24.00 KB
+2025-10-20T09:41:04: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-20T09:41:04: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-20T09:41:04: ==================================================
+2025-10-20T09:41:04: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-20T09:41:04: 📊 Health check: http://localhost:3001/api/health
+2025-10-20T09:41:04: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-20T09:41:04: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-20T09:41:04: ==================================================
+2025-10-20T09:41:04: ✅ Sunucu hazır ve çalışıyor!
+2025-10-20T09:41:04: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-20T11:10:41: 🔄 Veritabanı başlatılıyor...
+2025-10-20T11:10:41: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-20T11:10:41: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-20T11:10:41: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-20T11:10:41: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-20T11:10:41: ✅ Mevcut kullanıcılar korunuyor (4 adet)
+2025-10-20T11:10:41: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-20T11:10:41: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-20T11:10:41: 👥 Kullanıcı sayısı: 4
+2025-10-20T11:10:41: 📦 Kargo kayıt sayısı: 1
+2025-10-20T11:10:41: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-20T11:10:41: 📊 Boyut: 24.00 KB
+2025-10-20T11:10:41: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-20T11:10:41: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-20T11:10:41: ==================================================
+2025-10-20T11:10:41: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-20T11:10:41: 📊 Health check: http://localhost:3001/api/health
+2025-10-20T11:10:41: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-20T11:10:41: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-20T11:10:41: ==================================================
+2025-10-20T11:10:41: ✅ Sunucu hazır ve çalışıyor!
+2025-10-20T11:10:41: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-21T10:06:24: 🔄 Veritabanı başlatılıyor...
+2025-10-21T10:06:24: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-21T10:06:24: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-21T10:06:24: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-21T10:06:24: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-21T10:06:24: ✅ Mevcut kullanıcılar korunuyor (4 adet)
+2025-10-21T10:06:24: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-21T10:06:24: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-21T10:06:24: 👥 Kullanıcı sayısı: 4
+2025-10-21T10:06:24: 📦 Kargo kayıt sayısı: 1
+2025-10-21T10:06:24: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-21T10:06:24: 📊 Boyut: 24.00 KB
+2025-10-21T10:06:24: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-21T10:06:24: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-21T10:06:24: ==================================================
+2025-10-21T10:06:24: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-21T10:06:24: 📊 Health check: http://localhost:3001/api/health
+2025-10-21T10:06:24: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-21T10:06:24: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-21T10:06:24: ==================================================
+2025-10-21T10:06:24: ✅ Sunucu hazır ve çalışıyor!
+2025-10-21T10:06:24: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-22T10:03:38: 🔄 Veritabanı başlatılıyor...
+2025-10-22T10:03:38: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-22T10:03:38: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-22T10:03:38: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-22T10:03:38: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-22T10:03:38: ✅ Mevcut kullanıcılar korunuyor (4 adet)
+2025-10-22T10:03:38: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-22T10:03:38: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-22T10:03:38: 👥 Kullanıcı sayısı: 4
+2025-10-22T10:03:38: 📦 Kargo kayıt sayısı: 1
+2025-10-22T10:03:38: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-22T10:03:38: 📊 Boyut: 24.00 KB
+2025-10-22T10:03:38: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-22T10:03:38: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-22T10:03:38: ==================================================
+2025-10-22T10:03:38: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-22T10:03:38: 📊 Health check: http://localhost:3001/api/health
+2025-10-22T10:03:38: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-22T10:03:38: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-22T10:03:38: ==================================================
+2025-10-22T10:03:38: ✅ Sunucu hazır ve çalışıyor!
+2025-10-22T10:03:38: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-23T09:49:57: 🔄 Veritabanı başlatılıyor...
+2025-10-23T09:49:57: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-23T09:49:57: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-23T09:49:57: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-23T09:49:57: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-23T09:49:57: ✅ Mevcut kullanıcılar korunuyor (4 adet)
+2025-10-23T09:49:57: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-23T09:49:57: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-23T09:49:57: 👥 Kullanıcı sayısı: 4
+2025-10-23T09:49:57: 📦 Kargo kayıt sayısı: 1
+2025-10-23T09:49:57: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-23T09:49:57: 📊 Boyut: 24.00 KB
+2025-10-23T09:49:57: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-23T09:49:57: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-23T09:49:57: ==================================================
+2025-10-23T09:49:57: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-23T09:49:57: 📊 Health check: http://localhost:3001/api/health
+2025-10-23T09:49:57: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-23T09:49:57: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-23T09:49:57: ==================================================
+2025-10-23T09:49:57: ✅ Sunucu hazır ve çalışıyor!
+2025-10-23T09:49:57: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-24T09:54:52: 🔄 Veritabanı başlatılıyor...
+2025-10-24T09:54:52: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-24T09:54:52: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-24T09:54:52: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-24T09:54:52: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-24T09:54:52: ✅ Mevcut kullanıcılar korunuyor (4 adet)
+2025-10-24T09:54:52: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-24T09:54:52: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-24T09:54:52: 👥 Kullanıcı sayısı: 4
+2025-10-24T09:54:52: 📦 Kargo kayıt sayısı: 1
+2025-10-24T09:54:52: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-24T09:54:52: 📊 Boyut: 24.00 KB
+2025-10-24T09:54:52: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-24T09:54:52: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-24T09:54:52: ==================================================
+2025-10-24T09:54:52: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-24T09:54:52: 📊 Health check: http://localhost:3001/api/health
+2025-10-24T09:54:52: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-24T09:54:52: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-24T09:54:52: ==================================================
+2025-10-24T09:54:52: ✅ Sunucu hazır ve çalışıyor!
+2025-10-24T09:54:52: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-25T10:45:36: 🔄 Veritabanı başlatılıyor...
+2025-10-25T10:45:36: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-25T10:45:36: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-25T10:45:36: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-25T10:45:36: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-25T10:45:36: ✅ Mevcut kullanıcılar korunuyor (4 adet)
+2025-10-25T10:45:36: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-25T10:45:36: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-25T10:45:36: 👥 Kullanıcı sayısı: 4
+2025-10-25T10:45:36: 📦 Kargo kayıt sayısı: 1
+2025-10-25T10:45:36: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-25T10:45:36: 📊 Boyut: 24.00 KB
+2025-10-25T10:45:36: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-25T10:45:36: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-25T10:45:36: ==================================================
+2025-10-25T10:45:36: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-25T10:45:36: 📊 Health check: http://localhost:3001/api/health
+2025-10-25T10:45:36: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-25T10:45:36: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-25T10:45:36: ==================================================
+2025-10-25T10:45:36: ✅ Sunucu hazır ve çalışıyor!
+2025-10-25T10:45:36: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-27T09:27:09: 🔄 Veritabanı başlatılıyor...
+2025-10-27T09:27:09: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-27T09:27:09: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-27T09:27:09: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-27T09:27:09: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-27T09:27:09: ✅ Mevcut kullanıcılar korunuyor (4 adet)
+2025-10-27T09:27:09: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-27T09:27:09: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-27T09:27:09: 👥 Kullanıcı sayısı: 4
+2025-10-27T09:27:09: 📦 Kargo kayıt sayısı: 1
+2025-10-27T09:27:09: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-27T09:27:09: 📊 Boyut: 24.00 KB
+2025-10-27T09:27:09: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-27T09:27:09: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-27T09:27:09: ==================================================
+2025-10-27T09:27:09: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-27T09:27:09: 📊 Health check: http://localhost:3001/api/health
+2025-10-27T09:27:09: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-27T09:27:09: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-27T09:27:09: ==================================================
+2025-10-27T09:27:09: ✅ Sunucu hazır ve çalışıyor!
+2025-10-27T09:27:09: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-28T09:39:10: 🔄 Veritabanı başlatılıyor...
+2025-10-28T09:39:10: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-28T09:39:10: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-28T09:39:10: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-28T09:39:10: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-28T09:39:10: ✅ Mevcut kullanıcılar korunuyor (4 adet)
+2025-10-28T09:39:10: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-28T09:39:10: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-28T09:39:10: 👥 Kullanıcı sayısı: 4
+2025-10-28T09:39:10: 📦 Kargo kayıt sayısı: 1
+2025-10-28T09:39:10: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-28T09:39:10: 📊 Boyut: 24.00 KB
+2025-10-28T09:39:10: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-28T09:39:10: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-28T09:39:10: ==================================================
+2025-10-28T09:39:10: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-28T09:39:10: 📊 Health check: http://localhost:3001/api/health
+2025-10-28T09:39:10: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-28T09:39:10: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-28T09:39:10: ==================================================
+2025-10-28T09:39:10: ✅ Sunucu hazır ve çalışıyor!
+2025-10-28T09:39:10: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-30T09:50:20: 🔄 Veritabanı başlatılıyor...
+2025-10-30T09:50:20: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-30T09:50:20: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-30T09:50:20: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-30T09:50:20: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-30T09:50:20: ✅ Mevcut kullanıcılar korunuyor (4 adet)
+2025-10-30T09:50:20: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-30T09:50:20: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-30T09:50:20: 👥 Kullanıcı sayısı: 4
+2025-10-30T09:50:20: 📦 Kargo kayıt sayısı: 1
+2025-10-30T09:50:20: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-30T09:50:20: 📊 Boyut: 24.00 KB
+2025-10-30T09:50:20: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-30T09:50:20: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-30T09:50:20: ==================================================
+2025-10-30T09:50:20: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-30T09:50:20: 📊 Health check: http://localhost:3001/api/health
+2025-10-30T09:50:20: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-30T09:50:20: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-30T09:50:20: ==================================================
+2025-10-30T09:50:20: ✅ Sunucu hazır ve çalışıyor!
+2025-10-30T09:50:20: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-31T10:54:39: 🔄 Veritabanı başlatılıyor...
+2025-10-31T10:54:39: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-31T10:54:39: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-31T10:54:39: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-31T10:54:39: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-31T10:54:39: ✅ Mevcut kullanıcılar korunuyor (4 adet)
+2025-10-31T10:54:39: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-31T10:54:39: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-31T10:54:39: 👥 Kullanıcı sayısı: 4
+2025-10-31T10:54:39: 📦 Kargo kayıt sayısı: 1
+2025-10-31T10:54:39: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-31T10:54:39: 📊 Boyut: 24.00 KB
+2025-10-31T10:54:39: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-31T10:54:39: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-31T10:54:39: ==================================================
+2025-10-31T10:54:39: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-31T10:54:39: 📊 Health check: http://localhost:3001/api/health
+2025-10-31T10:54:39: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-31T10:54:39: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-31T10:54:39: ==================================================
+2025-10-31T10:54:39: ✅ Sunucu hazır ve çalışıyor!
+2025-10-31T10:54:39: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-10-31T14:19:04: 🔄 Veritabanı başlatılıyor...
+2025-10-31T14:19:04: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-10-31T14:19:04: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-31T14:19:04: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-10-31T14:19:04: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-31T14:19:04: ✅ Mevcut kullanıcılar korunuyor (4 adet)
+2025-10-31T14:19:04: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-10-31T14:19:04: 📊 Veritabanı istatistikleri alınıyor...
+2025-10-31T14:19:04: 👥 Kullanıcı sayısı: 4
+2025-10-31T14:19:04: 📦 Kargo kayıt sayısı: 1
+2025-10-31T14:19:04: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-10-31T14:19:04: 📊 Boyut: 24.00 KB
+2025-10-31T14:19:04: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-10-31T14:19:04: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-10-31T14:19:04: ==================================================
+2025-10-31T14:19:04: 🌐 Sunucu adresi: http://localhost:3001
+2025-10-31T14:19:04: 📊 Health check: http://localhost:3001/api/health
+2025-10-31T14:19:04: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-10-31T14:19:04: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-10-31T14:19:04: ==================================================
+2025-10-31T14:19:04: ✅ Sunucu hazır ve çalışıyor!
+2025-10-31T14:19:04: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-11-03T10:25:14: 🔄 Veritabanı başlatılıyor...
+2025-11-03T10:25:14: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-11-03T10:25:14: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-03T10:25:14: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-11-03T10:25:14: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-03T10:25:14: ✅ Mevcut kullanıcılar korunuyor (4 adet)
+2025-11-03T10:25:14: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-11-03T10:25:14: 📊 Veritabanı istatistikleri alınıyor...
+2025-11-03T10:25:14: 👥 Kullanıcı sayısı: 4
+2025-11-03T10:25:14: 📦 Kargo kayıt sayısı: 1
+2025-11-03T10:25:14: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-03T10:25:14: 📊 Boyut: 24.00 KB
+2025-11-03T10:25:14: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-11-03T10:25:14: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-11-03T10:25:14: ==================================================
+2025-11-03T10:25:14: 🌐 Sunucu adresi: http://localhost:3001
+2025-11-03T10:25:14: 📊 Health check: http://localhost:3001/api/health
+2025-11-03T10:25:14: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-11-03T10:25:14: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-11-03T10:25:14: ==================================================
+2025-11-03T10:25:14: ✅ Sunucu hazır ve çalışıyor!
+2025-11-03T10:25:14: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-11-04T09:53:52: 🔄 Veritabanı başlatılıyor...
+2025-11-04T09:53:52: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-11-04T09:53:52: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-04T09:53:52: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-11-04T09:53:52: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-04T09:53:52: ✅ Mevcut kullanıcılar korunuyor (4 adet)
+2025-11-04T09:53:52: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-11-04T09:53:52: 📊 Veritabanı istatistikleri alınıyor...
+2025-11-04T09:53:52: 👥 Kullanıcı sayısı: 4
+2025-11-04T09:53:52: 📦 Kargo kayıt sayısı: 1
+2025-11-04T09:53:52: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-04T09:53:52: 📊 Boyut: 24.00 KB
+2025-11-04T09:53:52: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-11-04T09:53:52: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-11-04T09:53:52: ==================================================
+2025-11-04T09:53:52: 🌐 Sunucu adresi: http://localhost:3001
+2025-11-04T09:53:52: 📊 Health check: http://localhost:3001/api/health
+2025-11-04T09:53:52: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-11-04T09:53:52: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-11-04T09:53:52: ==================================================
+2025-11-04T09:53:52: ✅ Sunucu hazır ve çalışıyor!
+2025-11-04T09:53:52: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-11-05T09:40:43: 🔄 Veritabanı başlatılıyor...
+2025-11-05T09:40:43: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-11-05T09:40:43: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-05T09:40:43: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-11-05T09:40:43: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-05T09:40:43: ✅ Mevcut kullanıcılar korunuyor (4 adet)
+2025-11-05T09:40:43: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-11-05T09:40:43: 📊 Veritabanı istatistikleri alınıyor...
+2025-11-05T09:40:43: 👥 Kullanıcı sayısı: 4
+2025-11-05T09:40:43: 📦 Kargo kayıt sayısı: 1
+2025-11-05T09:40:43: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-05T09:40:43: 📊 Boyut: 24.00 KB
+2025-11-05T09:40:43: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-11-05T09:40:43: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-11-05T09:40:43: ==================================================
+2025-11-05T09:40:43: 🌐 Sunucu adresi: http://localhost:3001
+2025-11-05T09:40:43: 📊 Health check: http://localhost:3001/api/health
+2025-11-05T09:40:43: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-11-05T09:40:43: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-11-05T09:40:43: ==================================================
+2025-11-05T09:40:43: ✅ Sunucu hazır ve çalışıyor!
+2025-11-05T09:40:43: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-11-06T09:18:27: 🔄 Veritabanı başlatılıyor...
+2025-11-06T09:18:27: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-11-06T09:18:27: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-06T09:18:27: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-11-06T09:18:27: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-06T09:18:27: ✅ Mevcut kullanıcılar korunuyor (4 adet)
+2025-11-06T09:18:27: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-11-06T09:18:27: 📊 Veritabanı istatistikleri alınıyor...
+2025-11-06T09:18:27: 👥 Kullanıcı sayısı: 4
+2025-11-06T09:18:27: 📦 Kargo kayıt sayısı: 1
+2025-11-06T09:18:27: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-06T09:18:27: 📊 Boyut: 24.00 KB
+2025-11-06T09:18:27: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-11-06T09:18:27: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-11-06T09:18:27: ==================================================
+2025-11-06T09:18:27: 🌐 Sunucu adresi: http://localhost:3001
+2025-11-06T09:18:27: 📊 Health check: http://localhost:3001/api/health
+2025-11-06T09:18:27: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-11-06T09:18:27: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-11-06T09:18:27: ==================================================
+2025-11-06T09:18:27: ✅ Sunucu hazır ve çalışıyor!
+2025-11-06T09:18:27: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-11-07T09:46:25: 🔄 Veritabanı başlatılıyor...
+2025-11-07T09:46:25: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-11-07T09:46:25: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-07T09:46:25: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-11-07T09:46:25: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-07T09:46:25: ✅ Mevcut kullanıcılar korunuyor (4 adet)
+2025-11-07T09:46:25: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-11-07T09:46:25: 📊 Veritabanı istatistikleri alınıyor...
+2025-11-07T09:46:25: 👥 Kullanıcı sayısı: 4
+2025-11-07T09:46:25: 📦 Kargo kayıt sayısı: 1
+2025-11-07T09:46:25: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-07T09:46:25: 📊 Boyut: 24.00 KB
+2025-11-07T09:46:25: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-11-07T09:46:25: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-11-07T09:46:25: ==================================================
+2025-11-07T09:46:25: 🌐 Sunucu adresi: http://localhost:3001
+2025-11-07T09:46:25: 📊 Health check: http://localhost:3001/api/health
+2025-11-07T09:46:25: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-11-07T09:46:25: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-11-07T09:46:25: ==================================================
+2025-11-07T09:46:25: ✅ Sunucu hazır ve çalışıyor!
+2025-11-07T09:46:25: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-11-08T09:54:16: 🔄 Veritabanı başlatılıyor...
+2025-11-08T09:54:16: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-11-08T09:54:16: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-08T09:54:16: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-11-08T09:54:16: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-08T09:54:16: ✅ Mevcut kullanıcılar korunuyor (4 adet)
+2025-11-08T09:54:16: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-11-08T09:54:16: 📊 Veritabanı istatistikleri alınıyor...
+2025-11-08T09:54:16: 👥 Kullanıcı sayısı: 4
+2025-11-08T09:54:16: 📦 Kargo kayıt sayısı: 1
+2025-11-08T09:54:16: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-08T09:54:16: 📊 Boyut: 24.00 KB
+2025-11-08T09:54:16: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-11-08T09:54:16: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-11-08T09:54:16: ==================================================
+2025-11-08T09:54:16: 🌐 Sunucu adresi: http://localhost:3001
+2025-11-08T09:54:16: 📊 Health check: http://localhost:3001/api/health
+2025-11-08T09:54:16: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-11-08T09:54:16: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-11-08T09:54:16: ==================================================
+2025-11-08T09:54:16: ✅ Sunucu hazır ve çalışıyor!
+2025-11-08T09:54:16: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-11-10T09:33:34: 🔄 Veritabanı başlatılıyor...
+2025-11-10T09:33:34: 🔄 Veritabanı bağlantısı deneniyor... (1/3)
+2025-11-10T09:33:34: 📁 Veritabanı yolu: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-10T09:33:34: ✅ SQLite veritabanına başarıyla bağlandı.
+2025-11-10T09:33:34: 📊 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-10T09:33:34: ✅ Mevcut kullanıcılar korunuyor (6 adet)
+2025-11-10T09:33:34: 🔄 Veritabanı bağlantısı kontrol ediliyor...
+2025-11-10T09:33:34: 📊 Veritabanı istatistikleri alınıyor...
+2025-11-10T09:33:34: 👥 Kullanıcı sayısı: 6
+2025-11-10T09:33:34: 📦 Kargo kayıt sayısı: 3
+2025-11-10T09:33:34: 📁 Veritabanı dosyası: C:\Users\HP\Desktop\SorunluKagoProjesi\project\backend\kargo.db
+2025-11-10T09:33:34: 📊 Boyut: 24.00 KB
+2025-11-10T09:33:34: ✅ Veritabanı dosyası mevcut ve kalıcı
+2025-11-10T09:33:34: 
+🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)
+2025-11-10T09:33:34: ==================================================
+2025-11-10T09:33:34: 🌐 Sunucu adresi: http://localhost:3001
+2025-11-10T09:33:34: 📊 Health check: http://localhost:3001/api/health
+2025-11-10T09:33:34: 🗄️  Veritabanı durumu: http://localhost:3001/api/database/status
+2025-11-10T09:33:34: 📋 Tüm veriler: http://localhost:3001/api/all-data
+2025-11-10T09:33:34: ==================================================
+2025-11-10T09:33:34: ✅ Sunucu hazır ve çalışıyor!
+2025-11-10T09:33:34: 💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor
+2025-11-10T10:07:32: 🔐 Login denemesi: { email: 'ahmet@verarkargo.com', passwordLength: 6 }
+2025-11-10T10:07:32: ❌ Kullanıcı bulunamadı: ahmet@verarkargo.com

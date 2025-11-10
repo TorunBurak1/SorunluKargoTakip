@@ -13,6 +13,7 @@ export const mockRecords: CargoRecord[] = [
     exitNumber: 'EX2024001234',
     carrierCompany: 'aras',
     senderCompany: 'Teknoloji A.Ş.',
+    recipientName: 'Mehmet Yılmaz',
     description: 'Paket hasarlı şekilde teslim edildi. Müşteri şikayeti mevcut. Kutu ezik ve içerik zarar görmüş durumda.',
     photos: [
       'https://images.pexels.com/photos/4481327/pexels-photo-4481327.jpeg?auto=compress&cs=tinysrgb&w=400',
@@ -29,6 +30,7 @@ export const mockRecords: CargoRecord[] = [
     exitNumber: 'EX2024001235',
     carrierCompany: 'ptt',
     senderCompany: 'Moda Dünyası Ltd.',
+    recipientName: 'Ayşe Demir',
     description: 'Yanlış adrese teslim edilmiş paket. Doğru adres araştırılıyor ve müşteri ile iletişim kuruldu.',
     photos: [
       'https://images.pexels.com/photos/4481328/pexels-photo-4481328.jpeg?auto=compress&cs=tinysrgb&w=400'
@@ -44,6 +46,7 @@ export const mockRecords: CargoRecord[] = [
     exitNumber: 'EX2024001236',
     carrierCompany: 'surat',
     senderCompany: 'Kitap Evi Yayıncılık',
+    recipientName: 'Ali Kaya',
     description: 'Geç teslim edilen paket için müşteri memnuniyetsizliği. Özür dilendi ve iade süreci tamamlandı.',
     photos: [],
     createdBy: '1',
@@ -57,11 +60,26 @@ export const mockRecords: CargoRecord[] = [
     exitNumber: 'EX2024001237',
     carrierCompany: 'yurtici',
     senderCompany: 'Elektronik Market',
+    recipientName: 'Zeynep Özkan',
     description: 'Paket kayıp. Müşteri kargo durumunu sorgulayamıyor ve paket sistemde görünmüyor.',
     photos: [],
     createdBy: '2',
     createdByName: 'Fatma Demir',
     createdAt: '2024-01-15T13:10:00Z',
     updatedAt: '2024-01-15T13:10:00Z',
+  },
+  {
+    id: '5',
+    barcodeNumber: '5678901234567',
+    exitNumber: 'EX2024001238',
+    carrierCompany: 'verar',
+    senderCompany: 'Gıda Toptancıları A.Ş.',
+    recipientName: 'Mustafa Çelik',
+    description: 'Verar Kargo İstanbul\'dan gönderilen paket beklenen sürede teslim edilemedi.',
+    photos: [],
+    createdBy: '1',
+    createdByName: 'Ahmet Yılmaz',
+    createdAt: '2024-01-16T10:20:00Z',
+    updatedAt: '2024-01-16T10:20:00Z',
   }
 ];
