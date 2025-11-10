@@ -228,20 +228,35 @@ class DatabaseManager {
   }
 
   /**
+   * SQL sorgusunu PostgreSQL formatına çevir (? -> $1, $2, $3)
+   */
+  convertToPostgresSQL(sql, params) {
+    if (!params || params.length === 0) {
+      return { sql, params };
+    }
+    
+    let paramIndex = 1;
+    const convertedSQL = sql.replace(/\?/g, () => `$${paramIndex++}`);
+    return { sql: convertedSQL, params };
+  }
+
+  /**
    * SQL sorgusu çalıştır (SQLite uyumluluğu için wrapper)
    */
   query(sql, params = []) {
     if (!this.pool) {
       throw new Error('Veritabanı bağlantısı yok');
     }
-    return this.pool.query(sql, params);
+    const { sql: pgSQL, params: pgParams } = this.convertToPostgresSQL(sql, params);
+    return this.pool.query(pgSQL, pgParams);
   }
 
   /**
    * SQLite db.all() uyumluluğu
    */
   all(sql, params, callback) {
-    this.pool.query(sql, params, (err, result) => {
+    const { sql: pgSQL, params: pgParams } = this.convertToPostgresSQL(sql, params);
+    this.pool.query(pgSQL, pgParams, (err, result) => {
       if (err) {
         callback(err, null);
       } else {
@@ -254,7 +269,8 @@ class DatabaseManager {
    * SQLite db.get() uyumluluğu
    */
   get(sql, params, callback) {
-    this.pool.query(sql, params, (err, result) => {
+    const { sql: pgSQL, params: pgParams } = this.convertToPostgresSQL(sql, params);
+    this.pool.query(pgSQL, pgParams, (err, result) => {
       if (err) {
         callback(err, null);
       } else {
@@ -267,7 +283,8 @@ class DatabaseManager {
    * SQLite db.run() uyumluluğu
    */
   run(sql, params, callback) {
-    this.pool.query(sql, params, (err, result) => {
+    const { sql: pgSQL, params: pgParams } = this.convertToPostgresSQL(sql, params);
+    this.pool.query(pgSQL, pgParams, (err, result) => {
       if (callback) {
         if (err) {
           callback(err);
