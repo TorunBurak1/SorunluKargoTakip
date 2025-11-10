@@ -19,7 +19,7 @@ class DatabaseManager {
    */
   connect() {
     return new Promise((resolve, reject) => {
-      this.connectionAttempts++;
+      this.connectionAttempts = (this.connectionAttempts || 0) + 1;
       
       console.log(`🔄 PostgreSQL bağlantısı deneniyor... (${this.connectionAttempts}/${this.maxRetries})`);
       
@@ -27,8 +27,9 @@ class DatabaseManager {
       const databaseUrl = process.env.DATABASE_URL;
       
       if (!databaseUrl) {
-        const error = new Error('DATABASE_URL environment variable bulunamadı');
+        const error = new Error('DATABASE_URL environment variable bulunamadı. Lütfen Render Environment ayarlarından DATABASE_URL ekleyin.');
         console.error('❌', error.message);
+        console.error('💡 Render Dashboard → Environment → Add Environment Variable → Key: DATABASE_URL');
         reject(error);
         return;
       }
