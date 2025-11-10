@@ -43,19 +43,24 @@ class DatabaseManager {
           // DNS lookup'u IPv4'e zorla
           dns.setDefaultResultOrder('ipv4first');
           
-          // Supabase için connection string'i direkt kullan (parse etme)
-          // Session Pooler zaten doğru formatlanmış connection string kullanıyor
+          // Connection string'den query parametrelerini temizle
+          let cleanUrl = databaseUrl.split('?')[0];
+          
+          // Supabase için connection string'i direkt kullan
+          // SSL ayarlarını düzelt - require yerine allow
           poolConfig = {
-            connectionString: databaseUrl,
+            connectionString: cleanUrl,
             ssl: { 
-              rejectUnauthorized: false,
-              require: true
+              rejectUnauthorized: false
             },
             connectionTimeoutMillis: 10000,
+            // SCRAM hatası için ek ayarlar
+            keepAlive: true,
+            keepAliveInitialDelayMillis: 10000,
           };
           
           try {
-            const url = new URL(databaseUrl);
+            const url = new URL(cleanUrl);
             console.log(`📡 Bağlantı: ${url.username}@${url.hostname}:${url.port || 5432}/${url.pathname.slice(1) || 'postgres'}`);
           } catch (e) {
             console.log(`📡 Bağlantı: Supabase PostgreSQL`);
