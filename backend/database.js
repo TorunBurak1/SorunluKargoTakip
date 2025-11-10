@@ -40,35 +40,25 @@ class DatabaseManager {
         let poolConfig;
         
         if (databaseUrl.includes('supabase')) {
+          // DNS lookup'u IPv4'e zorla
+          dns.setDefaultResultOrder('ipv4first');
+          
+          // Supabase için connection string'i direkt kullan (parse etme)
+          // Session Pooler zaten doğru formatlanmış connection string kullanıyor
+          poolConfig = {
+            connectionString: databaseUrl,
+            ssl: { 
+              rejectUnauthorized: false,
+              require: true
+            },
+            connectionTimeoutMillis: 10000,
+          };
+          
           try {
             const url = new URL(databaseUrl);
-            const hostname = url.hostname;
-            const port = url.port || 5432;
-            const database = url.pathname.slice(1) || 'postgres';
-            const username = url.username || 'postgres';
-            const password = url.password || '';
-            
-            // DNS lookup'u IPv4'e zorla
-            dns.setDefaultResultOrder('ipv4first');
-            
-            poolConfig = {
-              host: hostname,
-              port: parseInt(port),
-              database: database,
-              user: username,
-              password: password,
-              ssl: { rejectUnauthorized: false },
-              // IPv4 zorla
-              connectionTimeoutMillis: 10000,
-            };
-            
-            console.log(`📡 Bağlantı: ${username}@${hostname}:${port}/${database}`);
+            console.log(`📡 Bağlantı: ${url.username}@${url.hostname}:${url.port || 5432}/${url.pathname.slice(1) || 'postgres'}`);
           } catch (e) {
-            console.error('⚠️ Connection string parse edilemedi, connection string kullanılıyor:', e.message);
-            poolConfig = {
-              connectionString: databaseUrl,
-              ssl: { rejectUnauthorized: false },
-            };
+            console.log(`📡 Bağlantı: Supabase PostgreSQL`);
           }
         } else {
           poolConfig = {
