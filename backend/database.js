@@ -1,14 +1,13 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
-const fs = require('fs');
+const { Pool } = require('pg');
+require('dotenv').config();
 
-// Veritabanı dosyası yolu - mutlak yol kullan
-const dbPath = path.resolve(__dirname, 'kargo.db');
+// Not: Bu dosya artık PostgreSQL kullanıyor (SQLite yerine)
+// Veriler Supabase PostgreSQL veritabanında kalıcı olarak saklanır
 
-// Veritabanı bağlantı yönetimi
+// PostgreSQL bağlantı yönetimi
 class DatabaseManager {
   constructor() {
-    this.db = null;
+    this.pool = null;
     this.isConnected = false;
     this.connectionAttempts = 0;
     this.maxRetries = 3;
@@ -22,43 +21,48 @@ class DatabaseManager {
     return new Promise((resolve, reject) => {
       this.connectionAttempts++;
       
-      console.log(`🔄 Veritabanı bağlantısı deneniyor... (${this.connectionAttempts}/${this.maxRetries})`);
-      console.log(`📁 Veritabanı yolu: ${dbPath}`);
+      console.log(`🔄 PostgreSQL bağlantısı deneniyor... (${this.connectionAttempts}/${this.maxRetries})`);
       
-      // Veritabanı dizinini oluştur
-      const dbDir = path.dirname(dbPath);
-      if (!fs.existsSync(dbDir)) {
-        fs.mkdirSync(dbDir, { recursive: true });
-        console.log(`📁 Veritabanı dizini oluşturuldu: ${dbDir}`);
+      // DATABASE_URL environment variable'ından bağlantı bilgilerini al
+      const databaseUrl = process.env.DATABASE_URL;
+      
+      if (!databaseUrl) {
+        const error = new Error('DATABASE_URL environment variable bulunamadı');
+        console.error('❌', error.message);
+        reject(error);
+        return;
       }
       
-      this.db = new sqlite3.Database(dbPath, (err) => {
-        if (err) {
-          console.error(`❌ Veritabanı bağlantı hatası (${this.connectionAttempts}/${this.maxRetries}):`, err.message);
-          
-          if (this.connectionAttempts < this.maxRetries) {
-            console.log(`⏳ ${this.retryDelay}ms sonra tekrar deneniyor...`);
-            setTimeout(() => {
-              this.connect().then(resolve).catch(reject);
-            }, this.retryDelay);
+      try {
+        this.pool = new Pool({
+          connectionString: databaseUrl,
+          ssl: databaseUrl.includes('supabase') ? { rejectUnauthorized: false } : false,
+        });
+
+        // Bağlantıyı test et
+        this.pool.query('SELECT NOW()', (err, result) => {
+          if (err) {
+            console.error(`❌ PostgreSQL bağlantı hatası (${this.connectionAttempts}/${this.maxRetries}):`, err.message);
+            
+            if (this.connectionAttempts < this.maxRetries) {
+              console.log(`⏳ ${this.retryDelay}ms sonra tekrar deneniyor...`);
+              setTimeout(() => {
+                this.connect().then(resolve).catch(reject);
+              }, this.retryDelay);
+            } else {
+              reject(err);
+            }
           } else {
-            reject(err);
+            this.isConnected = true;
+            console.log('✅ PostgreSQL veritabanına başarıyla bağlandı.');
+            console.log(`📊 Bağlantı zamanı: ${result.rows[0].now}`);
+            resolve(this.pool);
           }
-        } else {
-          this.isConnected = true;
-          console.log('✅ SQLite veritabanına başarıyla bağlandı.');
-          console.log(`📊 Veritabanı dosyası: ${dbPath}`);
-          
-          // Bağlantı ayarları - veri kalıcılığı için
-          this.db.run('PRAGMA foreign_keys = ON');
-          this.db.run('PRAGMA journal_mode = DELETE'); // WAL yerine DELETE mode
-          this.db.run('PRAGMA synchronous = FULL'); // Veri güvenliği için FULL
-          this.db.run('PRAGMA cache_size = 1000');
-          this.db.run('PRAGMA temp_store = MEMORY');
-          
-          resolve(this.db);
-        }
-      });
+        });
+      } catch (error) {
+        console.error(`❌ PostgreSQL bağlantı hatası:`, error.message);
+        reject(error);
+      }
     });
   }
 
@@ -67,12 +71,12 @@ class DatabaseManager {
    */
   checkConnection() {
     return new Promise((resolve, reject) => {
-      if (!this.db || !this.isConnected) {
+      if (!this.pool || !this.isConnected) {
         reject(new Error('Veritabanı bağlantısı yok'));
         return;
       }
 
-      this.db.get('SELECT 1', (err) => {
+      this.pool.query('SELECT 1', (err) => {
         if (err) {
           this.isConnected = false;
           reject(err);
@@ -88,37 +92,23 @@ class DatabaseManager {
    */
   close() {
     return new Promise((resolve, reject) => {
-      if (!this.db) {
+      if (!this.pool) {
         resolve();
         return;
       }
 
-      // Veritabanını güvenli şekilde kapat
-      this.db.close((err) => {
+      this.pool.end((err) => {
         if (err) {
           console.error('❌ Veritabanı kapatma hatası:', err.message);
           reject(err);
         } else {
           console.log('✅ Veritabanı bağlantısı güvenli şekilde kapatıldı');
           this.isConnected = false;
-          this.db = null;
+          this.pool = null;
           resolve();
         }
       });
     });
-  }
-
-  /**
-   * Veritabanı dosyasının varlığını kontrol et
-   */
-  checkDatabaseFile() {
-    if (fs.existsSync(dbPath)) {
-      const stats = fs.statSync(dbPath);
-      console.log(`📁 Veritabanı dosyası: ${dbPath}`);
-      console.log(`📊 Boyut: ${(stats.size / 1024).toFixed(2)} KB`);
-      return true;
-    }
-    return false;
   }
 
   /**
@@ -132,25 +122,85 @@ class DatabaseManager {
       }
 
       const queries = [
-        'SELECT COUNT(*) as userCount FROM users',
-        'SELECT COUNT(*) as cargoCount FROM cargo_records',
+        'SELECT COUNT(*) as "userCount" FROM users',
+        'SELECT COUNT(*) as "cargoCount" FROM cargo_records',
         'SELECT status, COUNT(*) as count FROM cargo_records GROUP BY status'
       ];
 
       Promise.all(queries.map(query => 
         new Promise((resolveQuery, rejectQuery) => {
-          this.db.all(query, (err, rows) => {
+          this.pool.query(query, (err, result) => {
             if (err) rejectQuery(err);
-            else resolveQuery(rows);
+            else resolveQuery(result.rows);
           });
         })
       )).then(results => {
         resolve({
-          users: results[0][0].userCount,
-          cargoRecords: results[1][0].cargoCount,
+          users: parseInt(results[0][0].userCount),
+          cargoRecords: parseInt(results[1][0].cargoCount),
           statusDistribution: results[2]
         });
       }).catch(reject);
+    });
+  }
+
+  /**
+   * SQL sorgusu çalıştır (SQLite uyumluluğu için wrapper)
+   */
+  query(sql, params = []) {
+    if (!this.pool) {
+      throw new Error('Veritabanı bağlantısı yok');
+    }
+    return this.pool.query(sql, params);
+  }
+
+  /**
+   * SQLite db.all() uyumluluğu
+   */
+  all(sql, params, callback) {
+    this.pool.query(sql, params, (err, result) => {
+      if (err) {
+        callback(err, null);
+      } else {
+        callback(null, result.rows);
+      }
+    });
+  }
+
+  /**
+   * SQLite db.get() uyumluluğu
+   */
+  get(sql, params, callback) {
+    this.pool.query(sql, params, (err, result) => {
+      if (err) {
+        callback(err, null);
+      } else {
+        callback(null, result.rows[0] || null);
+      }
+    });
+  }
+
+  /**
+   * SQLite db.run() uyumluluğu
+   */
+  run(sql, params, callback) {
+    this.pool.query(sql, params, (err, result) => {
+      if (callback) {
+        if (err) {
+          callback(err);
+        } else {
+          // SQLite uyumluluğu için this.changes ve this.lastID
+          // PostgreSQL'de lastID yok, ama INSERT için RETURNING kullanılabilir
+          const mockThis = {
+            changes: result.rowCount || 0,
+            lastID: result.rows && result.rows[0] && result.rows[0].id ? result.rows[0].id : null
+          };
+          // Callback'i mockThis context'i ile çağır
+          if (typeof callback === 'function') {
+            callback.call(mockThis, null);
+          }
+        }
+      }
     });
   }
 }
@@ -186,123 +236,96 @@ const initDatabase = () => {
       // Veritabanı bağlantısını başlat
       const database = await initializeDatabase();
       
-      database.serialize(() => {
       // Users tablosu
-      database.run(`CREATE TABLE IF NOT EXISTS users (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        role TEXT NOT NULL CHECK(role IN ('staff', 'admin')),
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )`);
+      await database.query(`
+        CREATE TABLE IF NOT EXISTS users (
+          id VARCHAR(255) PRIMARY KEY,
+          name VARCHAR(255) NOT NULL,
+          email VARCHAR(255) UNIQUE NOT NULL,
+          role VARCHAR(50) NOT NULL CHECK(role IN ('staff', 'admin')),
+          password TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
 
       // CargoRecords tablosu
-      database.run(`CREATE TABLE IF NOT EXISTS cargo_records (
-        id TEXT PRIMARY KEY,
-        barcode_number TEXT NOT NULL,
-        exit_number TEXT NOT NULL,
-        carrier_company TEXT NOT NULL CHECK(carrier_company IN ('ptt', 'aras', 'surat', 'yurtici', 'verar')),
-        sender_company TEXT NOT NULL,
-        recipient_name TEXT NOT NULL,
-        description TEXT NOT NULL,
-        photos TEXT, -- JSON array olarak saklanacak
-        status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open', 'in_progress', 'resolved', 'paid', 'rejected')),
-        resolution_note TEXT, -- Çözülme sebebi
-        payment_note TEXT, -- Ödeme açıklaması
-        rejection_reason TEXT, -- Reddedilme sebebi
-        status_updated_by TEXT, -- Durumu güncelleyen kişi
-        status_updated_by_name TEXT, -- Durumu güncelleyen kişinin adı
-        status_updated_at DATETIME, -- Durum güncelleme tarihi
-        created_by TEXT NOT NULL,
-        created_by_name TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (created_by) REFERENCES users (id),
-        FOREIGN KEY (status_updated_by) REFERENCES users (id)
-      )`);
+      await database.query(`
+        CREATE TABLE IF NOT EXISTS cargo_records (
+          id VARCHAR(255) PRIMARY KEY,
+          barcode_number VARCHAR(255) NOT NULL,
+          exit_number VARCHAR(255) NOT NULL,
+          carrier_company VARCHAR(50) NOT NULL CHECK(carrier_company IN ('ptt', 'aras_aylin', 'aras_verar', 'aras_hatip', 'surat', 'verar', 'yurtici')),
+          sender_company VARCHAR(255) NOT NULL,
+          recipient_name VARCHAR(255) NOT NULL,
+          description TEXT NOT NULL,
+          photos TEXT,
+          status VARCHAR(50) NOT NULL DEFAULT 'open' CHECK(status IN ('open', 'in_progress', 'resolved', 'paid', 'rejected')),
+          resolution_note TEXT,
+          payment_note TEXT,
+          rejection_reason TEXT,
+          status_updated_by VARCHAR(255),
+          status_updated_by_name VARCHAR(255),
+          status_updated_at TIMESTAMP,
+          created_by VARCHAR(255) NOT NULL,
+          created_by_name VARCHAR(255) NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE RESTRICT,
+          FOREIGN KEY (status_updated_by) REFERENCES users (id) ON DELETE SET NULL
+        )
+      `);
 
-      // Mevcut tabloya yeni sütunları ekle (eğer yoksa) - hata kontrolü ile
-      database.run(`ALTER TABLE cargo_records ADD COLUMN status TEXT DEFAULT 'open'`, (err) => {
-        if (err && !err.message.includes('duplicate column name')) {
-          console.error('Status sütunu eklenirken hata:', err.message);
+      // Mevcut tablolara eksik sütunları ekle (eğer yoksa)
+      const alterQueries = [
+        `ALTER TABLE cargo_records ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'open'`,
+        `ALTER TABLE cargo_records ADD COLUMN IF NOT EXISTS resolution_note TEXT`,
+        `ALTER TABLE cargo_records ADD COLUMN IF NOT EXISTS payment_note TEXT`,
+        `ALTER TABLE cargo_records ADD COLUMN IF NOT EXISTS rejection_reason TEXT`,
+        `ALTER TABLE cargo_records ADD COLUMN IF NOT EXISTS status_updated_by VARCHAR(255)`,
+        `ALTER TABLE cargo_records ADD COLUMN IF NOT EXISTS status_updated_by_name VARCHAR(255)`,
+        `ALTER TABLE cargo_records ADD COLUMN IF NOT EXISTS status_updated_at TIMESTAMP`,
+        `ALTER TABLE cargo_records ADD COLUMN IF NOT EXISTS recipient_name VARCHAR(255)`,
+        `ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP`,
+        `ALTER TABLE users ADD COLUMN IF NOT EXISTS password TEXT`
+      ];
+
+      for (const query of alterQueries) {
+        try {
+          await database.query(query);
+        } catch (err) {
+          // Sütun zaten varsa hata verme
+          if (!err.message.includes('already exists') && !err.message.includes('duplicate')) {
+            console.error('Sütun ekleme hatası:', err.message);
+          }
         }
-      });
-      database.run(`ALTER TABLE cargo_records ADD COLUMN resolution_note TEXT`, (err) => {
-        if (err && !err.message.includes('duplicate column name')) {
-          console.error('Resolution note sütunu eklenirken hata:', err.message);
-        }
-      });
-      database.run(`ALTER TABLE cargo_records ADD COLUMN payment_note TEXT`, (err) => {
-        if (err && !err.message.includes('duplicate column name')) {
-          console.error('Payment note sütunu eklenirken hata:', err.message);
-        }
-      });
-      database.run(`ALTER TABLE cargo_records ADD COLUMN rejection_reason TEXT`, (err) => {
-        if (err && !err.message.includes('duplicate column name')) {
-          console.error('Rejection reason sütunu eklenirken hata:', err.message);
-        }
-      });
-      database.run(`ALTER TABLE cargo_records ADD COLUMN status_updated_by TEXT`, (err) => {
-        if (err && !err.message.includes('duplicate column name')) {
-          console.error('Status updated by sütunu eklenirken hata:', err.message);
-        }
-      });
-      database.run(`ALTER TABLE cargo_records ADD COLUMN status_updated_by_name TEXT`, (err) => {
-        if (err && !err.message.includes('duplicate column name')) {
-          console.error('Status updated by name sütunu eklenirken hata:', err.message);
-        }
-      });
-      database.run(`ALTER TABLE cargo_records ADD COLUMN status_updated_at DATETIME`, (err) => {
-        if (err && !err.message.includes('duplicate column name')) {
-          console.error('Status updated at sütunu eklenirken hata:', err.message);
-        }
-      });
-      database.run(`ALTER TABLE cargo_records ADD COLUMN recipient_name TEXT`, (err) => {
-        if (err && !err.message.includes('duplicate column name')) {
-          console.error('Recipient name sütunu eklenirken hata:', err.message);
-        }
-      });
-      database.run(`ALTER TABLE users ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP`, (err) => {
-        if (err && !err.message.includes('duplicate column name')) {
-          console.error('Users updated_at sütunu eklenirken hata:', err.message);
-        }
-      });
-      database.run(`ALTER TABLE users ADD COLUMN password TEXT`, (err) => {
-        if (err && !err.message.includes('duplicate column name')) {
-          console.error('Users password sütunu eklenirken hata:', err.message);
-        }
-      });
+      }
 
       // Sadece ilk kurulumda örnek kullanıcıları ekle
-      database.get('SELECT COUNT(*) as count FROM users', (err, row) => {
-        if (err) {
-          console.error('Kullanıcı sayısı kontrol edilemedi:', err.message);
-        } else if (row.count === 0) {
-          // Hiç kullanıcı yoksa örnek kullanıcıları ekle
-          database.run(`INSERT INTO users (id, name, email, role) VALUES 
-            ('1', 'Ahmet Yılmaz', 'ahmet@kargo.com', 'staff'),
-            ('2', 'Fatma Demir', 'fatma@kargo.com', 'staff'),
-            ('3', 'Mehmet Kaya', 'mehmet@kargo.com', 'admin')`);
-          console.log('✅ Örnek kullanıcılar eklendi (ilk kurulum)');
-        } else {
-          console.log(`✅ Mevcut kullanıcılar korunuyor (${row.count} adet)`);
-        }
-      });
+      const userCountResult = await database.query('SELECT COUNT(*) as count FROM users');
+      const userCount = parseInt(userCountResult.rows[0].count);
 
-      database.run(`PRAGMA foreign_keys = ON`, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-    });
+      if (userCount === 0) {
+        // Hiç kullanıcı yoksa örnek kullanıcıları ekle
+        await database.query(`
+          INSERT INTO users (id, name, email, role) VALUES 
+          ('1', 'Ahmet Yılmaz', 'ahmet@kargo.com', 'staff'),
+          ('2', 'Fatma Demir', 'fatma@kargo.com', 'staff'),
+          ('3', 'Mehmet Kaya', 'mehmet@kargo.com', 'admin')
+          ON CONFLICT (id) DO NOTHING
+        `);
+        console.log('✅ Örnek kullanıcılar eklendi (ilk kurulum)');
+      } else {
+        console.log(`✅ Mevcut kullanıcılar korunuyor (${userCount} adet)`);
+      }
+
+      console.log('✅ Veritabanı tabloları hazır');
+      resolve();
     } catch (error) {
+      console.error('❌ Veritabanı başlatma hatası:', error);
       reject(error);
     }
   });
 };
 
 module.exports = { db, initDatabase, dbManager, initializeDatabase, getDatabase };
-

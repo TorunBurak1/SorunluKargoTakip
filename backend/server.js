@@ -142,13 +142,13 @@ const startServer = async () => {
     console.log(`👥 Kullanıcı sayısı: ${stats.users}`);
     console.log(`📦 Kargo kayıt sayısı: ${stats.cargoRecords}`);
     
-    // Veritabanı dosyasının varlığını kontrol et
+    // Veritabanı bağlantısını kontrol et
     if (dbManager.checkDatabaseFile()) {
-      console.log('✅ Veritabanı dosyası mevcut ve kalıcı');
+      console.log('✅ Veritabanı bağlantısı aktif ve kalıcı');
     }
     
     app.listen(PORT, () => {
-      console.log('\n🚀 KARGO API SUNUCUSU BAŞLATILDI (SQLite)');
+      console.log('\n🚀 KARGO API SUNUCUSU BAŞLATILDI (PostgreSQL)');
       console.log('='.repeat(50));
       console.log(`🌐 Sunucu adresi: http://localhost:${PORT}`);
       console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
@@ -156,7 +156,7 @@ const startServer = async () => {
       console.log(`📋 Tüm veriler: http://localhost:${PORT}/api/all-data`);
       console.log('='.repeat(50));
       console.log('✅ Sunucu hazır ve çalışıyor!');
-      console.log('💾 Veriler SQLite dosyasında kalıcı olarak saklanıyor');
+      console.log('💾 Veriler PostgreSQL veritabanında kalıcı olarak saklanıyor');
     });
   } catch (err) {
     console.error('❌ Sunucu başlatma hatası:', err);
