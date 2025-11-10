@@ -306,10 +306,11 @@ const initializeDatabase = async () => {
 
 // Veritabanı bağlantısını al
 const getDatabase = () => {
-  if (!db) {
+  if (!dbManager.isConnected) {
     throw new Error('Veritabanı bağlantısı henüz kurulmamış');
   }
-  return db;
+  // PostgreSQL için dbManager'ı döndür (SQLite uyumluluğu için get/all/run metodları var)
+  return dbManager;
 };
 
 // Veritabanı tablolarını oluştur
