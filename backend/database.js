@@ -94,6 +94,7 @@ class DatabaseManager {
           }
         } else if (databaseUrl.includes('neon')) {
           // Neon için connection string'i direkt kullan (SSL gerekli)
+          // Connection string'deki query parametrelerini koru
           poolConfig = {
             connectionString: databaseUrl,
             ssl: { 
@@ -104,10 +105,12 @@ class DatabaseManager {
           };
           
           try {
-            const url = new URL(databaseUrl);
+            // URL parse için query parametrelerini geçici olarak kaldır
+            const urlWithoutQuery = databaseUrl.split('?')[0];
+            const url = new URL(urlWithoutQuery);
             console.log(`📡 Bağlantı: ${url.username}@${url.hostname}:${url.port || 5432}/${url.pathname.slice(1) || 'neondb'} (Neon)`);
           } catch (e) {
-            console.log(`📡 Bağlantı: Neon PostgreSQL`);
+            console.log(`📡 Bağlantı: Neon PostgreSQL (${databaseUrl.substring(0, 50)}...)`);
           }
         } else {
           // Diğer PostgreSQL veritabanları
