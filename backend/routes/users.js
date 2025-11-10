@@ -360,22 +360,48 @@ router.patch('/:id/password', async (req, res) => {
 
 // Kullanıcı sil
 router.delete('/:id', (req, res) => {
-  const sql = 'DELETE FROM users WHERE id = ?';
-  
+  const userId = req.params.id;
   const db = getDatabase();
-  db.run(sql, [req.params.id], function(err) {
+  
+  // Önce kullanıcıya ait kargo kayıtlarını kontrol et
+  const checkSql = `
+    SELECT COUNT(*) as count 
+    FROM cargo_records 
+    WHERE created_by = ? OR status_updated_by = ?
+  `;
+  
+  db.get(checkSql, [userId, userId], (err, row) => {
     if (err) {
       console.error('Database error:', err);
       res.status(500).json({ error: err.message });
       return;
     }
     
-    if (this.changes === 0) {
-      res.status(404).json({ error: 'Kullanıcı bulunamadı' });
+    // Eğer kullanıcıya ait kargo kayıtları varsa silme işlemini engelle
+    if (row && row.count > 0) {
+      res.status(400).json({ 
+        error: `Bu kullanıcı ${row.count} adet kargo kaydı ile ilişkilidir. Kullanıcıyı silmek için önce bu kayıtları silmeniz veya başka bir kullanıcıya atamanız gerekir.` 
+      });
       return;
     }
     
-    res.json({ message: 'Kullanıcı başarıyla silindi' });
+    // Kullanıcıya ait kargo kaydı yoksa silme işlemini gerçekleştir
+    const deleteSql = 'DELETE FROM users WHERE id = ?';
+    
+    db.run(deleteSql, [userId], function(deleteErr) {
+      if (deleteErr) {
+        console.error('Database error:', deleteErr);
+        res.status(500).json({ error: deleteErr.message });
+        return;
+      }
+      
+      if (this.changes === 0) {
+        res.status(404).json({ error: 'Kullanıcı bulunamadı' });
+        return;
+      }
+      
+      res.json({ message: 'Kullanıcı başarıyla silindi' });
+    });
   });
 });
 

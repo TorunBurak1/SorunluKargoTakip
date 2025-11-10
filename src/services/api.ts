@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://localhost:3001/api';
+// Environment variable'dan API URL'ini al, yoksa localhost kullan
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
 
 export interface User {
   id: string;
@@ -118,9 +119,33 @@ class ApiService {
   }
 
   async deleteUser(id: string): Promise<void> {
-    return this.request<void>(`/users/${id}`, {
-      method: 'DELETE',
-    });
+    const url = `${API_BASE_URL}/users/${id}`;
+    console.log('API Service: Deleting user:', url);
+    
+    try {
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      console.log('API Service: Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Kullanıcı silinirken bir hata oluştu' }));
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+      
+      // DELETE işlemi başarılı, body olmayabilir
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        await response.json();
+      }
+    } catch (error) {
+      console.error('API Service: Delete user failed:', error);
+      throw error;
+    }
   }
 
   // Kargo kayıt işlemleri

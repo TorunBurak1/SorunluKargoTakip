@@ -116,6 +116,32 @@ npm run dev  # nodemon ile otomatik yeniden başlatma
 npm run dev  # Vite development server
 ```
 
+## Netlify Deployment
+
+### Environment Variables
+
+Netlify'da frontend'i deploy ederken, backend API URL'ini environment variable olarak ayarlamanız gerekir:
+
+1. **Netlify Dashboard** → **Site settings** → **Environment variables**
+2. **Add variable** butonuna tıklayın
+3. Şu değişkeni ekleyin:
+   - **Key**: `VITE_API_BASE_URL`
+   - **Value**: Backend'inizin gerçek URL'i (örn: `https://your-backend-url.com/api`)
+
+**Önemli**: Backend'iniz internet üzerinden erişilebilir olmalıdır. Eğer backend localhost'ta çalışıyorsa, başka bir bilgisayardan erişilemez.
+
+### Backend Hosting Seçenekleri
+
+Backend'inizi host etmek için şu seçenekleri kullanabilirsiniz:
+- **Heroku**
+- **Railway**
+- **Render**
+- **DigitalOcean**
+- **AWS/Google Cloud/Azure**
+- **VPS (Virtual Private Server)**
+
+Backend deploy edildikten sonra, Netlify environment variable'ında backend URL'ini ayarlayın.
+
 ## Lisans
 
 Bu proje MIT lisansı altında lisanslanmıştır.

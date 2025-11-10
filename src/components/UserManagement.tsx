@@ -118,8 +118,10 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onClose }) => {
     if (window.confirm(`${user.name} kullanıcısını silmek istediğinizden emin misiniz?`)) {
       try {
         await deleteUser(user.id);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Kullanıcı silinirken hata:', error);
+        const errorMessage = error?.message || error?.error || 'Kullanıcı silinirken bir hata oluştu';
+        alert(errorMessage);
       }
     }
   };
