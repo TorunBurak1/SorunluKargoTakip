@@ -18,8 +18,8 @@ class DatabaseManager {
   /**
    * Veritabanına bağlan
    */
-  connect() {
-    return new Promise((resolve, reject) => {
+  async connect() {
+    return new Promise(async (resolve, reject) => {
       this.connectionAttempts = (this.connectionAttempts || 0) + 1;
       
       console.log(`🔄 PostgreSQL bağlantısı deneniyor... (${this.connectionAttempts}/${this.maxRetries})`);
@@ -46,24 +46,50 @@ class DatabaseManager {
           // Connection string'den query parametrelerini temizle
           let cleanUrl = databaseUrl.split('?')[0];
           
-          // Supabase için connection string'i direkt kullan
-          // SSL ayarlarını düzelt - require yerine allow
-          poolConfig = {
-            connectionString: cleanUrl,
-            ssl: { 
-              rejectUnauthorized: false
-            },
-            connectionTimeoutMillis: 10000,
-            // SCRAM hatası için ek ayarlar
-            keepAlive: true,
-            keepAliveInitialDelayMillis: 10000,
-          };
-          
           try {
             const url = new URL(cleanUrl);
-            console.log(`📡 Bağlantı: ${url.username}@${url.hostname}:${url.port || 5432}/${url.pathname.slice(1) || 'postgres'}`);
+            const hostname = url.hostname;
+            const port = url.port || 5432;
+            const database = url.pathname.slice(1) || 'postgres';
+            const username = url.username || 'postgres';
+            const password = url.password || '';
+            
+            // Hostname'i IPv4 adresine çevir
+            const ipv4Address = await new Promise((resolve, reject) => {
+              dns.lookup(hostname, { family: 4, all: false }, (err, address) => {
+                if (err) {
+                  console.error('⚠️ DNS lookup hatası, hostname kullanılıyor:', err.message);
+                  resolve(hostname); // Hata durumunda hostname'i kullan
+                } else {
+                  resolve(address); // IPv4 adresini kullan
+                }
+              });
+            });
+            
+            console.log(`📡 Bağlantı: ${username}@${ipv4Address}:${port}/${database} (IPv4)`);
+            
+            poolConfig = {
+              host: ipv4Address,
+              port: parseInt(port),
+              database: database,
+              user: username,
+              password: password,
+              ssl: { 
+                rejectUnauthorized: false
+              },
+              connectionTimeoutMillis: 10000,
+              keepAlive: true,
+              keepAliveInitialDelayMillis: 10000,
+            };
           } catch (e) {
-            console.log(`📡 Bağlantı: Supabase PostgreSQL`);
+            console.error('⚠️ Connection string parse edilemedi, connection string kullanılıyor:', e.message);
+            poolConfig = {
+              connectionString: cleanUrl,
+              ssl: { 
+                rejectUnauthorized: false
+              },
+              connectionTimeoutMillis: 10000,
+            };
           }
         } else {
           poolConfig = {
