@@ -151,10 +151,7 @@ const startServer = async () => {
     console.log(`👥 Kullanıcı sayısı: ${stats.users}`);
     console.log(`📦 Kargo kayıt sayısı: ${stats.cargoRecords}`);
     
-    // Veritabanı dosyasının varlığını kontrol et
-    if (dbManager.checkDatabaseFile()) {
-      console.log('✅ Veritabanı dosyası mevcut ve kalıcı');
-    }
+    console.log('✅ Veritabanı bağlantısı aktif ve kalıcı (PostgreSQL)');
     
     app.listen(PORT, () => {
       console.log('\n🚀 KARGO API SUNUCUSU BAŞLATILDI (KALICI SQLITE)');
@@ -202,6 +199,8 @@ process.on('SIGTERM', async () => {
 
 // Sunucuyu başlat
 startServer();
+
+
 
 
 
