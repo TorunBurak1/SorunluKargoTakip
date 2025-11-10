@@ -35,8 +35,31 @@ class DatabaseManager {
       }
       
       try {
+        // Supabase için connection string'i düzelt (IPv6 sorununu çöz)
+        let connectionString = databaseUrl;
+        if (databaseUrl.includes('supabase')) {
+          // Supabase connection string'inde hostname kullan (IPv4 DNS çözümlemesi)
+          // Örnek: postgresql://postgres:pass@db.xxxxx.supabase.co:5432/postgres
+          // IPv6 adresi varsa hostname'e çevir
+          try {
+            const url = new URL(databaseUrl);
+            // Eğer hostname IPv6 adresi ise, domain adını kullan
+            if (url.hostname.includes(':')) {
+              // IPv6 adresi varsa, domain adını kullan
+              const domainMatch = databaseUrl.match(/@([^:]+):/);
+              if (domainMatch) {
+                const domain = domainMatch[1];
+                connectionString = databaseUrl.replace(url.hostname, domain);
+              }
+            }
+          } catch (e) {
+            // URL parse hatası, orijinal string'i kullan
+            console.log('⚠️ Connection string parse edilemedi, orijinal kullanılıyor');
+          }
+        }
+        
         this.pool = new Pool({
-          connectionString: databaseUrl,
+          connectionString: connectionString,
           ssl: databaseUrl.includes('supabase') ? { rejectUnauthorized: false } : false,
         });
 
