@@ -2,7 +2,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'staff' | 'admin';
+  role: 'calisan' | 'admin';
 }
 
 export interface CargoRecord {
