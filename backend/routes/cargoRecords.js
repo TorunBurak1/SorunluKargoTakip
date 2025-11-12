@@ -24,27 +24,38 @@ router.get('/', (req, res) => {
       return;
     }
     
-    const records = rows.map(row => ({
-      id: row.id,
-      barcodeNumber: row.barcode_number,
-      exitNumber: row.exit_number,
-      carrierCompany: row.carrier_company,
-      senderCompany: row.sender_company,
-      recipientName: row.recipient_name,
-      description: row.description,
-      photos: JSON.parse(row.photos || '[]'),
-      status: row.status || 'open',
-      resolutionNote: row.resolution_note,
-      paymentNote: row.payment_note,
-      rejectionReason: row.rejection_reason,
-      statusUpdatedBy: row.status_updated_by,
-      statusUpdatedByName: row.status_updated_by_name,
-      statusUpdatedAt: row.status_updated_at,
-      createdBy: row.created_by,
-      createdByName: row.created_by_name,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at
-    }));
+    const records = rows.map(row => {
+      // Photos'u parse et
+      let photosArray = [];
+      try {
+        photosArray = JSON.parse(row.photos || '[]');
+      } catch (parseErr) {
+        console.error('JSON parse error for photos:', parseErr, 'Row ID:', row.id);
+        photosArray = [];
+      }
+      
+      return {
+        id: row.id,
+        barcodeNumber: row.barcode_number,
+        exitNumber: row.exit_number,
+        carrierCompany: row.carrier_company,
+        senderCompany: row.sender_company,
+        recipientName: row.recipient_name,
+        description: row.description,
+        photos: photosArray,
+        status: row.status || 'open',
+        resolutionNote: row.resolution_note,
+        paymentNote: row.payment_note,
+        rejectionReason: row.rejection_reason,
+        statusUpdatedBy: row.status_updated_by,
+        statusUpdatedByName: row.status_updated_by_name,
+        statusUpdatedAt: row.status_updated_at,
+        createdBy: row.created_by,
+        createdByName: row.created_by_name,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+      };
+    });
     
     res.json(records);
   });
@@ -75,6 +86,15 @@ router.get('/:id', (req, res) => {
       return;
     }
     
+    // Photos'u parse et
+    let photosArray = [];
+    try {
+      photosArray = JSON.parse(row.photos || '[]');
+    } catch (parseErr) {
+      console.error('JSON parse error for photos in get/:id:', parseErr, 'Row ID:', row.id);
+      photosArray = [];
+    }
+    
     const record = {
       id: row.id,
       barcodeNumber: row.barcode_number,
@@ -83,7 +103,7 @@ router.get('/:id', (req, res) => {
       senderCompany: row.sender_company,
       recipientName: row.recipient_name,
       description: row.description,
-      photos: JSON.parse(row.photos || '[]'),
+      photos: photosArray,
       status: row.status || 'open',
       resolutionNote: row.resolution_note,
       paymentNote: row.payment_note,

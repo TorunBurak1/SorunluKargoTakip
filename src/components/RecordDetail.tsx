@@ -261,15 +261,18 @@ export const RecordDetail: React.FC<RecordDetailProps> = ({ record, onBack, isAd
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {record.photos.map((photo, index) => {
-                  // Eski blob URL'leri kontrol et (blob: ile başlar)
-                  const isBlobUrl = photo.startsWith('blob:');
-                  const isValidBase64 = photo.startsWith('data:image/');
+                  // Fotoğraf tipini kontrol et
+                  const isBlobUrl = photo && typeof photo === 'string' && photo.startsWith('blob:');
+                  const isValidBase64 = photo && typeof photo === 'string' && photo.startsWith('data:image/');
+                  const isEmpty = !photo || photo === '' || photo === null || photo === undefined;
                   
                   return (
                     <div key={index} className="relative group">
-                      {isBlobUrl ? (
+                      {isEmpty || isBlobUrl ? (
                         <div className="w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center">
-                          <p className="text-gray-500 text-sm">Fotoğraf görüntülenemiyor</p>
+                          <p className="text-gray-500 text-sm">
+                            {isEmpty ? 'Fotoğraf bulunamadı' : 'Fotoğraf görüntülenemiyor'}
+                          </p>
                         </div>
                       ) : (
                         <img
@@ -279,18 +282,31 @@ export const RecordDetail: React.FC<RecordDetailProps> = ({ record, onBack, isAd
                           onError={(e) => {
                             // Hata durumunda placeholder göster
                             const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
                             const parent = target.parentElement;
-                            if (parent) {
+                            if (parent && !parent.querySelector('.error-placeholder')) {
+                              target.style.display = 'none';
                               const placeholder = document.createElement('div');
-                              placeholder.className = 'w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center';
+                              placeholder.className = 'error-placeholder w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center';
                               placeholder.innerHTML = '<p class="text-gray-500 text-sm">Fotoğraf yüklenemedi</p>';
                               parent.appendChild(placeholder);
                             }
                           }}
+                          onLoad={(e) => {
+                            // Başarıyla yüklendiğinde hata placeholder'ını kaldır
+                            const target = e.target as HTMLImageElement;
+                            const parent = target.parentElement;
+                            if (parent) {
+                              const errorPlaceholder = parent.querySelector('.error-placeholder');
+                              if (errorPlaceholder) {
+                                errorPlaceholder.remove();
+                              }
+                              // Görüntüyü tekrar göster
+                              target.style.display = 'block';
+                            }
+                          }}
                         />
                       )}
-                      {!isBlobUrl && (
+                      {!isEmpty && !isBlobUrl && (
                         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center">
                           <button className="opacity-0 group-hover:opacity-100 bg-white text-gray-900 px-3 py-1 rounded-full text-sm font-medium transition-opacity">
                             Büyüt

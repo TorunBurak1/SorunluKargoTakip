@@ -74,27 +74,38 @@ app.get('/api/all-data', (req, res) => {
       }
       
       // Kargo kayıtlarını formatla
-      const formattedCargoRecords = cargoRecords.map(row => ({
-        id: row.id,
-        barcodeNumber: row.barcode_number,
-        exitNumber: row.exit_number,
-        carrierCompany: row.carrier_company,
-        senderCompany: row.sender_company,
-        recipientName: row.recipient_name,
-        description: row.description,
-        photos: JSON.parse(row.photos || '[]'),
-        status: row.status || 'open',
-        resolutionNote: row.resolution_note,
-        paymentNote: row.payment_note,
-        rejectionReason: row.rejection_reason,
-        statusUpdatedBy: row.status_updated_by,
-        statusUpdatedByName: row.status_updated_by_name,
-        statusUpdatedAt: row.status_updated_at,
-        createdBy: row.created_by,
-        createdByName: row.created_by_name,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at
-      }));
+      const formattedCargoRecords = cargoRecords.map(row => {
+        // Photos'u parse et
+        let photosArray = [];
+        try {
+          photosArray = JSON.parse(row.photos || '[]');
+        } catch (parseErr) {
+          console.error('JSON parse error for photos in getAllData:', parseErr, 'Row ID:', row.id);
+          photosArray = [];
+        }
+        
+        return {
+          id: row.id,
+          barcodeNumber: row.barcode_number,
+          exitNumber: row.exit_number,
+          carrierCompany: row.carrier_company,
+          senderCompany: row.sender_company,
+          recipientName: row.recipient_name,
+          description: row.description,
+          photos: photosArray,
+          status: row.status || 'open',
+          resolutionNote: row.resolution_note,
+          paymentNote: row.payment_note,
+          rejectionReason: row.rejection_reason,
+          statusUpdatedBy: row.status_updated_by,
+          statusUpdatedByName: row.status_updated_by_name,
+          statusUpdatedAt: row.status_updated_at,
+          createdBy: row.created_by,
+          createdByName: row.created_by_name,
+          createdAt: row.created_at,
+          updatedAt: row.updated_at
+        };
+      });
       
       res.json({
         users: users,
