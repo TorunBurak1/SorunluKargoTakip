@@ -10,7 +10,7 @@ interface StaffDashboardProps {
 }
 
 export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user, onLogout, onViewRecord }) => {
-  const { records, addRecord, updateRecord, updateRecordStatus } = useRecords();
+  const { records, addRecord, updateRecord, updateRecordStatus, loading, error } = useRecords();
   const [showForm, setShowForm] = useState(false);
   const [statusUpdateRecord, setStatusUpdateRecord] = useState<CargoRecord | null>(null);
   const [formData, setFormData] = useState({
@@ -519,7 +519,9 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user, onLogout, 
         {/* Records List */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">Kayıtlarım ({filteredUserRecords.length})</h2>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Kayıtlarım {loading ? '(Yükleniyor...)' : `(${filteredUserRecords.length})`}
+            </h2>
             <div className="relative w-64">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
@@ -528,11 +530,31 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user, onLogout, 
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                 placeholder="Kayıtlarımda ara..."
+                disabled={loading}
               />
             </div>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+              <p className="text-red-800 text-sm">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-2 text-red-600 hover:text-red-800 text-sm font-medium underline"
+              >
+                Sayfayı Yenile
+              </button>
+            </div>
+          )}
           
-          {filteredUserRecords.length === 0 ? (
+          {loading ? (
+            <div className="bg-white rounded-xl shadow-sm border p-12 text-center">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500 mb-4"></div>
+              <p className="text-gray-600">Kayıtlar yükleniyor...</p>
+              <p className="text-gray-500 text-sm mt-2">Sunucu uyku modundaysa bu işlem 10-15 saniye sürebilir</p>
+            </div>
+          ) : filteredUserRecords.length === 0 ? (
             <div className="bg-white rounded-xl shadow-sm border p-8 text-center">
               <FileText className="mx-auto h-16 w-16 text-gray-400 mb-4" />
               <p className="text-gray-600">

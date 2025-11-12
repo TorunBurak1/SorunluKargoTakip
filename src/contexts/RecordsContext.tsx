@@ -45,7 +45,15 @@ export const RecordsProvider: React.FC<RecordsProviderProps> = ({ children }) =>
       setLoading(true);
       setError(null);
       console.log('RecordsContext: Kayıtlar yükleniyor...');
-      console.log('RecordsContext: API Base URL:', 'http://localhost:3001/api');
+      
+      // Önce health check yap (sunucuyu uyandır)
+      try {
+        console.log('RecordsContext: Health check yapılıyor...');
+        await apiService.healthCheck();
+        console.log('RecordsContext: Health check başarılı');
+      } catch (healthError) {
+        console.log('RecordsContext: Health check başarısız, devam ediliyor...', healthError);
+      }
       
       // Önce getAllData endpoint'ini dene
       try {
@@ -65,7 +73,13 @@ export const RecordsProvider: React.FC<RecordsProviderProps> = ({ children }) =>
     } catch (err) {
       console.error('RecordsContext: Kayıtlar yüklenirken hata:', err);
       console.error('RecordsContext: Hata detayı:', err);
-      setError(err instanceof Error ? err.message : 'Kayıtlar yüklenirken hata oluştu');
+      const errorMessage = err instanceof Error ? err.message : 'Kayıtlar yüklenirken hata oluştu';
+      setError(errorMessage);
+      
+      // Kullanıcıya daha anlaşılır mesaj göster
+      if (errorMessage.includes('zaman aşımı') || errorMessage.includes('uyku modunda')) {
+        setError('Sunucu uyku modunda. Lütfen birkaç saniye bekleyip sayfayı yenileyin.');
+      }
     } finally {
       setLoading(false);
     }

@@ -43,15 +43,27 @@ export interface CreateCargoRecordData {
 }
 
 class ApiService {
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  // Timeout için AbortController kullan
+  private createTimeoutSignal(timeoutMs: number = 30000): AbortSignal {
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(), timeoutMs);
+    return controller.signal;
+  }
+
+  private async request<T>(endpoint: string, options: RequestInit = {}, retries: number = 2): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
     console.log('API Service: Requesting URL:', url);
+    
+    // Timeout ekle (30 saniye) - eğer zaten bir signal varsa onu kullan
+    const timeoutSignal = options.signal || this.createTimeoutSignal(30000);
+    
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
       },
       ...options,
+      signal: timeoutSignal,
     };
 
     try {
@@ -75,10 +87,31 @@ class ApiService {
       return data;
     } catch (error) {
       console.error('API Service: Request failed:', error);
+      
+      // Abort hatası (timeout)
+      if (error instanceof Error && error.name === 'AbortError') {
+        // Retry yapılabilir mi kontrol et
+        if (retries > 0) {
+          console.log(`API Service: Retrying... (${retries} retries left)`);
+          // 2 saniye bekle ve tekrar dene
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          return this.request<T>(endpoint, options, retries - 1);
+        }
+        throw new Error('İstek zaman aşımına uğradı. Sunucu yanıt vermiyor. Lütfen tekrar deneyin.');
+      }
+      
       // Network hatalarını daha anlaşılır hale getir
       if (error instanceof TypeError && error.message.includes('fetch')) {
-        throw new Error('Sunucuya bağlanılamadı. Lütfen internet bağlantınızı kontrol edin.');
+        // Retry yapılabilir mi kontrol et
+        if (retries > 0) {
+          console.log(`API Service: Network error, retrying... (${retries} retries left)`);
+          // 2 saniye bekle ve tekrar dene
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          return this.request<T>(endpoint, options, retries - 1);
+        }
+        throw new Error('Sunucuya bağlanılamadı. Sunucu uyku modunda olabilir, lütfen birkaç saniye bekleyip tekrar deneyin.');
       }
+      
       throw error;
     }
   }
