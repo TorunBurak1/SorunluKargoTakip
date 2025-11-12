@@ -260,20 +260,46 @@ export const RecordDetail: React.FC<RecordDetailProps> = ({ record, onBack, isAd
                 Fotoğraflar ({record.photos.length})
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {record.photos.map((photo, index) => (
-                  <div key={index} className="relative group">
-                    <img
-                      src={photo}
-                      alt={`Fotoğraf ${index + 1}`}
-                      className="w-full h-48 object-cover rounded-lg shadow-sm group-hover:shadow-md transition-shadow"
-                    />
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center">
-                      <button className="opacity-0 group-hover:opacity-100 bg-white text-gray-900 px-3 py-1 rounded-full text-sm font-medium transition-opacity">
-                        Büyüt
-                      </button>
+                {record.photos.map((photo, index) => {
+                  // Eski blob URL'leri kontrol et (blob: ile başlar)
+                  const isBlobUrl = photo.startsWith('blob:');
+                  const isValidBase64 = photo.startsWith('data:image/');
+                  
+                  return (
+                    <div key={index} className="relative group">
+                      {isBlobUrl ? (
+                        <div className="w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center">
+                          <p className="text-gray-500 text-sm">Fotoğraf görüntülenemiyor</p>
+                        </div>
+                      ) : (
+                        <img
+                          src={photo}
+                          alt={`Fotoğraf ${index + 1}`}
+                          className="w-full h-48 object-cover rounded-lg shadow-sm group-hover:shadow-md transition-shadow"
+                          onError={(e) => {
+                            // Hata durumunda placeholder göster
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const parent = target.parentElement;
+                            if (parent) {
+                              const placeholder = document.createElement('div');
+                              placeholder.className = 'w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center';
+                              placeholder.innerHTML = '<p class="text-gray-500 text-sm">Fotoğraf yüklenemedi</p>';
+                              parent.appendChild(placeholder);
+                            }
+                          }}
+                        />
+                      )}
+                      {!isBlobUrl && (
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center">
+                          <button className="opacity-0 group-hover:opacity-100 bg-white text-gray-900 px-3 py-1 rounded-full text-sm font-medium transition-opacity">
+                            Büyüt
+                          </button>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}

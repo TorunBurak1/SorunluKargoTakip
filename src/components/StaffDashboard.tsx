@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Package, Calendar, Camera, FileText, LogOut, X, Search } from 'lucide-react';
+import { Plus, Package, Calendar, Camera, FileText, LogOut, X, Search, Edit, Trash2 } from 'lucide-react';
 import { CargoRecord, User, RecordStatus, CARRIER_COMPANIES } from '../types';
 import { useRecords } from '../contexts/RecordsContext';
 
@@ -29,6 +29,18 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user, onLogout, 
   });
   const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editRecord, setEditRecord] = useState<CargoRecord | null>(null);
+  const [editFormData, setEditFormData] = useState({
+    barcodeNumber: '',
+    exitNumber: '',
+    carrierCompany: 'ptt' as 'ptt' | 'aras' | 'surat' | 'yurtici' | 'verar',
+    senderCompany: '',
+    recipientName: '',
+    description: '',
+  });
+  const [editPhotos, setEditPhotos] = useState<string[]>([]); // Mevcut fotoğraflar (base64)
+  const [newPhotos, setNewPhotos] = useState<File[]>([]); // Yeni eklenen fotoğraflar
 
   const userRecords = records.filter(record => record.createdBy === user.id);
   
@@ -73,45 +85,79 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user, onLogout, 
     return status === 'open' || status === 'in_progress';
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Fotoğrafı base64 formatına çevir (maksimum 5MB)
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      // Dosya boyutu kontrolü (5MB = 5 * 1024 * 1024 bytes)
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        reject(new Error(`${file.name} dosyası çok büyük (${(file.size / 1024 / 1024).toFixed(2)}MB). Maksimum 5MB olmalıdır.`));
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        resolve(result); // data:image/jpeg;base64,... formatında
+      };
+      reader.onerror = (error) => reject(new Error(`Fotoğraf okunurken hata: ${error}`));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Seçilen fotoğrafları URL'lere çevir
-    const photoUrls = selectedPhotos.map(photo => URL.createObjectURL(photo));
-
-    // Yeni kayıt oluştur
-    const newRecord: CargoRecord = {
-      id: Date.now().toString(), // Basit ID oluşturma
-      barcodeNumber: formData.barcodeNumber,
-      exitNumber: formData.exitNumber,
-      carrierCompany: formData.carrierCompany,
-      senderCompany: formData.senderCompany,
-      recipientName: formData.recipientName,
-      description: formData.description,
-      photos: photoUrls, // Seçilen fotoğrafların URL'leri
-      status: 'open', // Varsayılan durum
-      createdBy: user.id,
-      createdByName: user.name,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    // Context'e yeni kaydı ekle
-    addRecord(newRecord);
+    if (isSubmitting) return; // Çift tıklamayı önle
     
-    console.log('Yeni kayıt eklendi:', newRecord);
-    console.log('Toplam kayıt sayısı:', records.length + 1);
+    setIsSubmitting(true);
     
-    setShowForm(false);
-    setFormData({ 
-      barcodeNumber: '', 
-      exitNumber: '', 
-      carrierCompany: 'ptt', 
-      senderCompany: '', 
-      recipientName: '',
-      description: '' 
-    });
-    setSelectedPhotos([]);
+    try {
+      // Seçilen fotoğrafları base64 formatına çevir
+      const photoBase64Array = selectedPhotos.length > 0
+        ? await Promise.all(selectedPhotos.map(photo => convertFileToBase64(photo)))
+        : [];
+
+      // Yeni kayıt oluştur (ID backend tarafından oluşturulacak)
+      const newRecord: CargoRecord = {
+        id: '', // Backend'den gelecek
+        barcodeNumber: formData.barcodeNumber,
+        exitNumber: formData.exitNumber,
+        carrierCompany: formData.carrierCompany,
+        senderCompany: formData.senderCompany,
+        recipientName: formData.recipientName,
+        description: formData.description,
+        photos: photoBase64Array, // Base64 formatında fotoğraflar
+        status: 'open', // Varsayılan durum
+        createdBy: user.id,
+        createdByName: user.name,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      // Context'e yeni kaydı ekle (await ile bekliyoruz)
+      await addRecord(newRecord);
+      
+      console.log('Yeni kayıt başarıyla eklendi');
+      
+      // Başarılı olduysa formu temizle
+      setShowForm(false);
+      setFormData({ 
+        barcodeNumber: '', 
+        exitNumber: '', 
+        carrierCompany: 'ptt', 
+        senderCompany: '', 
+        recipientName: '',
+        description: '' 
+      });
+      setSelectedPhotos([]);
+    } catch (error) {
+      console.error('Kayıt ekleme hatası:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Kayıt eklenirken bir hata oluştu';
+      alert(`Hata: ${errorMessage}\n\nLütfen tekrar deneyin.`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleStatusUpdateClick = (record: CargoRecord) => {
@@ -152,6 +198,82 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user, onLogout, 
       paymentNote: '',
       rejectionReason: '',
     });
+  };
+
+  // Kayıt düzenleme fonksiyonları
+  const handleEditClick = (record: CargoRecord) => {
+    setEditRecord(record);
+    setEditFormData({
+      barcodeNumber: record.barcodeNumber,
+      exitNumber: record.exitNumber,
+      carrierCompany: record.carrierCompany,
+      senderCompany: record.senderCompany,
+      recipientName: record.recipientName,
+      description: record.description,
+    });
+    setEditPhotos([...record.photos]); // Mevcut fotoğrafları kopyala
+    setNewPhotos([]); // Yeni fotoğrafları temizle
+  };
+
+  const handleEditCancel = () => {
+    setEditRecord(null);
+    setEditFormData({
+      barcodeNumber: '',
+      exitNumber: '',
+      carrierCompany: 'ptt',
+      senderCompany: '',
+      recipientName: '',
+      description: '',
+    });
+    setEditPhotos([]);
+    setNewPhotos([]);
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editRecord || isSubmitting) return;
+
+    setIsSubmitting(true);
+    
+    try {
+      // Yeni fotoğrafları base64'e çevir
+      const newPhotoBase64Array = newPhotos.length > 0
+        ? await Promise.all(newPhotos.map(photo => convertFileToBase64(photo)))
+        : [];
+
+      // Tüm fotoğrafları birleştir (mevcut + yeni)
+      const allPhotos = [...editPhotos, ...newPhotoBase64Array];
+
+      // Kaydı güncelle
+      await updateRecord(editRecord.id, {
+        barcodeNumber: editFormData.barcodeNumber,
+        exitNumber: editFormData.exitNumber,
+        carrierCompany: editFormData.carrierCompany,
+        senderCompany: editFormData.senderCompany,
+        recipientName: editFormData.recipientName,
+        description: editFormData.description,
+        photos: allPhotos,
+      });
+
+      console.log('Kayıt başarıyla güncellendi');
+      handleEditCancel(); // Modalı kapat
+    } catch (error) {
+      console.error('Kayıt güncelleme hatası:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Kayıt güncellenirken bir hata oluştu';
+      alert(`Hata: ${errorMessage}\n\nLütfen tekrar deneyin.`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Fotoğraf silme
+  const handleRemovePhoto = (index: number) => {
+    setEditPhotos(editPhotos.filter((_, i) => i !== index));
+  };
+
+  // Yeni fotoğraf silme (henüz eklenmemiş)
+  const handleRemoveNewPhoto = (index: number) => {
+    setNewPhotos(newPhotos.filter((_, i) => i !== index));
   };
 
   return (
@@ -365,14 +487,27 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user, onLogout, 
               <div className="flex space-x-4">
                 <button
                   type="submit"
-                  className="flex-1 bg-teal-500 hover:bg-teal-600 text-white py-2 px-4 rounded-lg transition-colors"
+                  disabled={isSubmitting}
+                  className={`flex-1 py-2 px-4 rounded-lg transition-colors flex items-center justify-center ${
+                    isSubmitting 
+                      ? 'bg-teal-400 cursor-not-allowed text-white' 
+                      : 'bg-teal-500 hover:bg-teal-600 text-white'
+                  }`}
                 >
-                  Kaydet
+                  {isSubmitting ? (
+                    <>
+                      <span className="animate-spin mr-2">⏳</span>
+                      Kaydediliyor...
+                    </>
+                  ) : (
+                    'Kaydet'
+                  )}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-lg transition-colors"
+                  disabled={isSubmitting}
+                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   İptal
                 </button>
@@ -443,22 +578,35 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user, onLogout, 
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(record.status)}`}>
                           {getStatusText(record.status)}
                         </span>
-                        {canChangeStatus(record.status) && (
+                        <div className="flex items-center space-x-3">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleStatusUpdateClick(record);
+                              handleEditClick(record);
                             }}
-                            className="text-purple-600 hover:text-purple-900 text-xs font-medium"
+                            className="flex items-center text-blue-600 hover:text-blue-900 text-xs font-medium transition-colors"
+                            title="Kaydı Düzenle"
                           >
-                            Durum Güncelle
+                            <Edit className="w-4 h-4 mr-1" />
+                            Düzenle
                           </button>
-                        )}
-                        {!canChangeStatus(record.status) && (
-                          <span className="text-gray-400 text-xs font-medium">
-                            Durum Değiştirilemez
-                          </span>
-                        )}
+                          {canChangeStatus(record.status) && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleStatusUpdateClick(record);
+                              }}
+                              className="text-purple-600 hover:text-purple-900 text-xs font-medium"
+                            >
+                              Durum Güncelle
+                            </button>
+                          )}
+                          {!canChangeStatus(record.status) && (
+                            <span className="text-gray-400 text-xs font-medium">
+                              Durum Değiştirilemez
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <div className="flex items-center text-xs text-gray-500 space-x-4">
                         <div className="flex items-center">
@@ -582,6 +730,230 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user, onLogout, 
                   type="button"
                   onClick={handleStatusUpdateCancel}
                   className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-lg transition-colors"
+                >
+                  İptal
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Kayıt Düzenleme Modalı */}
+      {editRecord && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b">
+              <h2 className="text-xl font-semibold text-gray-900">Kayıt Düzenle</h2>
+              <button
+                onClick={handleEditCancel}
+                disabled={isSubmitting}
+                className="text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleEditSubmit} className="p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Barkod Numarası *
+                  </label>
+                  <input
+                    type="text"
+                    value={editFormData.barcodeNumber}
+                    onChange={(e) => setEditFormData({ ...editFormData, barcodeNumber: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Çıkış Numarası *
+                  </label>
+                  <input
+                    type="text"
+                    value={editFormData.exitNumber}
+                    onChange={(e) => setEditFormData({ ...editFormData, exitNumber: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Taşıyıcı Firma *
+                  </label>
+                  <select
+                    value={editFormData.carrierCompany}
+                    onChange={(e) => setEditFormData({ ...editFormData, carrierCompany: e.target.value as typeof editFormData.carrierCompany })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    required
+                  >
+                    {CARRIER_COMPANIES.map((company) => (
+                      <option key={company.value} value={company.value}>
+                        {company.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Gönderici Firma *
+                  </label>
+                  <input
+                    type="text"
+                    value={editFormData.senderCompany}
+                    onChange={(e) => setEditFormData({ ...editFormData, senderCompany: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    required
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Alıcı Adı *
+                  </label>
+                  <input
+                    type="text"
+                    value={editFormData.recipientName}
+                    onChange={(e) => setEditFormData({ ...editFormData, recipientName: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    required
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Açıklama *
+                  </label>
+                  <textarea
+                    value={editFormData.description}
+                    onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Mevcut Fotoğraflar */}
+              {editPhotos.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Mevcut Fotoğraflar
+                  </label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {editPhotos.map((photo, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={photo}
+                          alt={`Fotoğraf ${index + 1}`}
+                          className="w-full h-32 object-cover rounded-lg border"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemovePhoto(index)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+                          title="Fotoğrafı Sil"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Yeni Fotoğraf Ekleme */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Yeni Fotoğraf Ekle
+                </label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-teal-500 transition-colors">
+                  <input
+                    id="edit-photo-upload"
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      if (e.target.files) {
+                        const files = Array.from(e.target.files);
+                        setNewPhotos(prev => [...prev, ...files]);
+                      }
+                    }}
+                  />
+                  <label
+                    htmlFor="edit-photo-upload"
+                    className="cursor-pointer flex flex-col items-center"
+                  >
+                    <Camera className="w-8 h-8 text-gray-400 mb-2" />
+                    <p className="text-sm text-gray-600">
+                      Fotoğraf eklemek için tıklayın veya sürükleyin
+                    </p>
+                  </label>
+                </div>
+              </div>
+
+              {/* Yeni Seçilen Fotoğraflar */}
+              {newPhotos.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Yeni Eklenen Fotoğraflar ({newPhotos.length})
+                  </label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {newPhotos.map((photo, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={URL.createObjectURL(photo)}
+                          alt={`Yeni fotoğraf ${index + 1}`}
+                          className="w-full h-32 object-cover rounded-lg border"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveNewPhoto(index)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+                          title="Fotoğrafı Kaldır"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                        <p className="text-xs text-gray-500 mt-1 truncate">
+                          {photo.name}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex space-x-4 pt-4">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className={`flex-1 py-2 px-4 rounded-lg transition-colors flex items-center justify-center ${
+                    isSubmitting 
+                      ? 'bg-teal-400 cursor-not-allowed text-white' 
+                      : 'bg-teal-500 hover:bg-teal-600 text-white'
+                  }`}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span className="animate-spin mr-2">⏳</span>
+                      Güncelleniyor...
+                    </>
+                  ) : (
+                    'Kaydet'
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleEditCancel}
+                  disabled={isSubmitting}
+                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   İptal
                 </button>

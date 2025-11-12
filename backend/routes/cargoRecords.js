@@ -117,12 +117,23 @@ router.post('/', (req, res) => {
   
   // Validasyon
   if (!barcodeNumber || !exitNumber || !carrierCompany || !senderCompany || !recipientName || !description || !createdBy || !createdByName) {
+    console.error('Validation error: Missing required fields', req.body);
     res.status(400).json({ error: 'Tüm gerekli alanlar doldurulmalıdır' });
     return;
   }
   
   const id = uuidv4();
   const now = new Date().toISOString();
+  
+  // Photos'u JSON'a çevir
+  let photosJson;
+  try {
+    photosJson = JSON.stringify(photos || []);
+  } catch (err) {
+    console.error('JSON stringify error for photos:', err);
+    res.status(400).json({ error: 'Fotoğraflar işlenirken hata oluştu' });
+    return;
+  }
   
   const sql = `
     INSERT INTO cargo_records 
@@ -138,12 +149,14 @@ router.post('/', (req, res) => {
     senderCompany,
     recipientName,
     description,
-    JSON.stringify(photos),
+    photosJson,
     createdBy,
     createdByName,
     now,
     now
   ];
+  
+  console.log('Creating cargo record:', { id, barcodeNumber, exitNumber, photosCount: photos?.length || 0 });
   
   const db = getDatabase();
   db.run(sql, params, function(err) {
@@ -167,9 +180,24 @@ router.post('/', (req, res) => {
     
     db.get(selectSql, [id], (err, row) => {
       if (err) {
-        console.error('Database error:', err);
+        console.error('Database error (select):', err);
         res.status(500).json({ error: err.message });
         return;
+      }
+      
+      if (!row) {
+        console.error('Record not found after insert:', id);
+        res.status(500).json({ error: 'Kayıt oluşturuldu ancak geri getirilemedi' });
+        return;
+      }
+      
+      // Photos'u parse et
+      let photosArray = [];
+      try {
+        photosArray = JSON.parse(row.photos || '[]');
+      } catch (parseErr) {
+        console.error('JSON parse error for photos:', parseErr);
+        photosArray = [];
       }
       
       const record = {
@@ -180,7 +208,7 @@ router.post('/', (req, res) => {
         senderCompany: row.sender_company,
         recipientName: row.recipient_name,
         description: row.description,
-        photos: JSON.parse(row.photos || '[]'),
+        photos: photosArray,
         status: row.status || 'open',
         resolutionNote: row.resolution_note,
         paymentNote: row.payment_note,
@@ -194,6 +222,7 @@ router.post('/', (req, res) => {
         updatedAt: row.updated_at
       };
       
+      console.log('Cargo record created successfully:', record.id);
       res.status(201).json(record);
     });
   });

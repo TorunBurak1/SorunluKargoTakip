@@ -5,8 +5,36 @@ const { initDatabase, dbManager, initializeDatabase, getDatabase } = require('./
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// CORS Configuration
+// Environment variable'dan allowed origins al, yoksa varsayılanları kullan
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',')
+  : [
+      'https://sorunlu-kargo-takip.netlify.app',
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'http://127.0.0.1:5173',
+      'http://127.0.0.1:3000'
+    ];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Origin yoksa (örneğin Postman, mobile app) veya allowed origins içindeyse izin ver
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS policy tarafından izin verilmedi'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  optionsSuccessStatus: 200
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 

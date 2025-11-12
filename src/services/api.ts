@@ -59,8 +59,15 @@ class ApiService {
       console.log('API Service: Response status:', response.status);
       
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        let errorMessage = `HTTP error! status: ${response.status}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (parseError) {
+          // JSON parse edilemezse status text'i kullan
+          errorMessage = response.statusText || errorMessage;
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -68,6 +75,10 @@ class ApiService {
       return data;
     } catch (error) {
       console.error('API Service: Request failed:', error);
+      // Network hatalarını daha anlaşılır hale getir
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Sunucuya bağlanılamadı. Lütfen internet bağlantınızı kontrol edin.');
+      }
       throw error;
     }
   }
