@@ -1,5 +1,5 @@
-import React from 'react';
-import { ArrowLeft, Package, Calendar, User, Camera, Building2, Truck } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft, Package, Calendar, User, Camera, Building2, Truck, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { CargoRecord, RecordStatus, CARRIER_COMPANIES } from '../types';
 
 interface RecordDetailProps {
@@ -9,6 +9,28 @@ interface RecordDetailProps {
 }
 
 export const RecordDetail: React.FC<RecordDetailProps> = ({ record, onBack, isAdmin = false }) => {
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
+  
+  // ESC tuşu ile modal'ı kapat
+  React.useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && selectedPhotoIndex !== null) {
+        setSelectedPhotoIndex(null);
+      }
+    };
+    
+    if (selectedPhotoIndex !== null) {
+      window.addEventListener('keydown', handleEscape);
+      // Modal açıkken body scroll'unu engelle
+      document.body.style.overflow = 'hidden';
+    }
+    
+    return () => {
+      window.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedPhotoIndex]);
+  
   const getStatusColor = (status: RecordStatus) => {
     switch (status) {
       case 'open': return 'bg-orange-100 text-orange-800 border-orange-200';
@@ -278,7 +300,9 @@ export const RecordDetail: React.FC<RecordDetailProps> = ({ record, onBack, isAd
                         <img
                           src={photo}
                           alt={`Fotoğraf ${index + 1}`}
-                          className="w-full h-48 object-cover rounded-lg shadow-sm group-hover:shadow-md transition-shadow"
+                          className="w-full h-48 object-cover rounded-lg shadow-sm group-hover:shadow-md transition-shadow cursor-pointer"
+                          onClick={() => setSelectedPhotoIndex(index)}
+                          loading="lazy"
                           onError={(e) => {
                             // Hata durumunda placeholder göster
                             const target = e.target as HTMLImageElement;
@@ -307,7 +331,10 @@ export const RecordDetail: React.FC<RecordDetailProps> = ({ record, onBack, isAd
                         />
                       )}
                       {!isEmpty && !isBlobUrl && (
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center">
+                        <div 
+                          className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center cursor-pointer"
+                          onClick={() => setSelectedPhotoIndex(index)}
+                        >
                           <button className="opacity-0 group-hover:opacity-100 bg-white text-gray-900 px-3 py-1 rounded-full text-sm font-medium transition-opacity">
                             Büyüt
                           </button>
@@ -316,6 +343,59 @@ export const RecordDetail: React.FC<RecordDetailProps> = ({ record, onBack, isAd
                     </div>
                   );
                 })}
+              </div>
+            </div>
+          )}
+
+          {/* Fotoğraf Büyütme Modalı */}
+          {selectedPhotoIndex !== null && record.photos[selectedPhotoIndex] && (
+            <div 
+              className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4"
+              onClick={() => setSelectedPhotoIndex(null)}
+            >
+              <div className="relative max-w-7xl max-h-full w-full h-full flex items-center justify-center">
+                <button
+                  onClick={() => setSelectedPhotoIndex(null)}
+                  className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10 bg-black bg-opacity-50 rounded-full p-2"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+                
+                {record.photos.length > 1 && (
+                  <>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedPhotoIndex(selectedPhotoIndex > 0 ? selectedPhotoIndex - 1 : record.photos.length - 1);
+                      }}
+                      className="absolute left-4 text-white hover:text-gray-300 transition-colors z-10 bg-black bg-opacity-50 rounded-full p-2"
+                    >
+                      <ChevronLeft className="w-6 h-6" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedPhotoIndex(selectedPhotoIndex < record.photos.length - 1 ? selectedPhotoIndex + 1 : 0);
+                      }}
+                      className="absolute right-4 text-white hover:text-gray-300 transition-colors z-10 bg-black bg-opacity-50 rounded-full p-2"
+                    >
+                      <ChevronRight className="w-6 h-6" />
+                    </button>
+                  </>
+                )}
+                
+                <img
+                  src={record.photos[selectedPhotoIndex]}
+                  alt={`Fotoğraf ${selectedPhotoIndex + 1}`}
+                  className="max-w-full max-h-full object-contain"
+                  onClick={(e) => e.stopPropagation()}
+                />
+                
+                {record.photos.length > 1 && (
+                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white bg-black bg-opacity-50 px-4 py-2 rounded-full text-sm">
+                    {selectedPhotoIndex + 1} / {record.photos.length}
+                  </div>
+                )}
               </div>
             </div>
           )}
