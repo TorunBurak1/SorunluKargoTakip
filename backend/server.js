@@ -181,10 +181,12 @@ const startServer = async () => {
     console.log(`👥 Kullanıcı sayısı: ${stats.users}`);
     console.log(`📦 Kargo kayıt sayısı: ${stats.cargoRecords}`);
     
-    console.log('✅ Veritabanı bağlantısı aktif ve kalıcı (PostgreSQL)');
+    const dbType = dbManager.databaseType === 'postgresql' ? 'PostgreSQL' : 'SQLite';
+    const dbTypeEmoji = dbManager.databaseType === 'postgresql' ? '🐘' : '💾';
+    console.log(`✅ Veritabanı bağlantısı aktif ve kalıcı (${dbType})`);
     
     app.listen(PORT, () => {
-      console.log('\n🚀 KARGO API SUNUCUSU BAŞLATILDI (PostgreSQL)');
+      console.log(`\n🚀 KARGO API SUNUCUSU BAŞLATILDI (${dbType})`);
       console.log('='.repeat(50));
       console.log(`🌐 Sunucu adresi: http://localhost:${PORT}`);
       console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
@@ -192,7 +194,7 @@ const startServer = async () => {
       console.log(`📋 Tüm veriler: http://localhost:${PORT}/api/all-data`);
       console.log('='.repeat(50));
       console.log('✅ Sunucu hazır ve çalışıyor!');
-      console.log('💾 Veriler PostgreSQL veritabanında kalıcı olarak saklanıyor');
+      console.log(`${dbTypeEmoji} Veriler ${dbType} veritabanında kalıcı olarak saklanıyor`);
     });
   } catch (err) {
     console.error('❌ Sunucu başlatma hatası:', err);
