@@ -156,6 +156,26 @@ app.get('/api/database/status', async (req, res) => {
   }
 });
 
+// Constraint kaldırma endpoint'i (manuel olarak çalıştırılabilir)
+app.post('/api/database/remove-constraints', async (req, res) => {
+  try {
+    const { removeCarrierCompanyConstraints } = require('./database');
+    const result = await removeCarrierCompanyConstraints();
+    res.json({
+      status: 'OK',
+      message: 'Constraint kaldırma işlemi tamamlandı',
+      removed: result.removed,
+      errors: result.errors
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'ERROR',
+      error: error.message,
+      message: 'Constraint kaldırma hatası'
+    });
+  }
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

@@ -480,6 +480,110 @@ const getDatabase = () => {
   return dbManager;
 };
 
+// Constraint kaldırma fonksiyonu (ayrı bir fonksiyon olarak)
+const removeCarrierCompanyConstraints = async () => {
+  if (dbManager.databaseType !== 'postgresql') {
+    return { removed: [], errors: [] };
+  }
+  
+  const removed = [];
+  const errors = [];
+  
+  console.log('🔍 carrier_company constraint\'leri aranıyor ve kaldırılıyor...');
+  
+  try {
+    // Yöntem 1: information_schema üzerinden
+    try {
+      const constraintQuery1 = `
+        SELECT constraint_name 
+        FROM information_schema.table_constraints 
+        WHERE table_name = 'cargo_records' 
+        AND constraint_type = 'CHECK'
+      `;
+      const result1 = await dbManager.query(constraintQuery1);
+      if (result1.rows && result1.rows.length > 0) {
+        for (const row of result1.rows) {
+          const constraintName = row.constraint_name;
+          // Sadece carrier_company ile ilgili olanları kaldır
+          if (constraintName.includes('carrier') || constraintName.includes('company')) {
+            try {
+              await dbManager.query(`ALTER TABLE cargo_records DROP CONSTRAINT IF EXISTS "${constraintName}" CASCADE`);
+              removed.push(constraintName);
+              console.log(`✅ Constraint kaldırıldı (yöntem 1): ${constraintName}`);
+            } catch (e) {
+              errors.push(`${constraintName}: ${e.message}`);
+              console.log(`⚠️ Constraint kaldırılamadı (${constraintName}):`, e.message);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      errors.push(`Yöntem 1: ${e.message}`);
+    }
+    
+    // Yöntem 2: pg_constraint üzerinden (daha direkt)
+    try {
+      const constraintQuery2 = `
+        SELECT conname 
+        FROM pg_constraint 
+        WHERE conrelid = 'cargo_records'::regclass 
+        AND contype = 'c'
+      `;
+      const result2 = await dbManager.query(constraintQuery2);
+      if (result2.rows && result2.rows.length > 0) {
+        for (const row of result2.rows) {
+          const constraintName = row.conname;
+          // Sadece carrier_company ile ilgili olanları kaldır
+          if (constraintName.includes('carrier') || constraintName.includes('company')) {
+            try {
+              await dbManager.query(`ALTER TABLE cargo_records DROP CONSTRAINT IF EXISTS "${constraintName}" CASCADE`);
+              if (!removed.includes(constraintName)) {
+                removed.push(constraintName);
+              }
+              console.log(`✅ Constraint kaldırıldı (yöntem 2): ${constraintName}`);
+            } catch (e) {
+              if (!errors.some(err => err.includes(constraintName))) {
+                errors.push(`${constraintName}: ${e.message}`);
+              }
+              console.log(`⚠️ Constraint kaldırılamadı (${constraintName}):`, e.message);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      errors.push(`Yöntem 2: ${e.message}`);
+    }
+    
+    // Yöntem 3: Bilinen constraint isimlerini direkt dene
+    const knownConstraintNames = [
+      'cargo_records_carrier_company_check',
+      'cargo_records_carrier_company_check1',
+      'cargo_records_carrier_company_check2',
+      'carrier_company_check',
+      'cargo_records_carrier_check'
+    ];
+    for (const constraintName of knownConstraintNames) {
+      try {
+        await dbManager.query(`ALTER TABLE cargo_records DROP CONSTRAINT IF EXISTS "${constraintName}" CASCADE`);
+        if (!removed.includes(constraintName)) {
+          removed.push(constraintName);
+        }
+        console.log(`✅ Bilinen constraint kaldırıldı: ${constraintName}`);
+      } catch (e) {
+        // Constraint yoksa hata verme, sadece logla
+        if (e.message && !e.message.includes('does not exist')) {
+          errors.push(`${constraintName}: ${e.message}`);
+        }
+      }
+    }
+  } catch (err) {
+    errors.push(`Genel hata: ${err.message}`);
+    console.log('ℹ️ Constraint kaldırma denemesi:', err.message);
+  }
+  
+  return { removed, errors };
+};
+
 // Veritabanı tablolarını oluştur
 const initDatabase = () => {
   return new Promise(async (resolve, reject) => {
@@ -490,73 +594,7 @@ const initDatabase = () => {
       
       if (dbType === 'postgresql') {
         // ÖNCE: Tüm carrier_company constraint'lerini agresif şekilde kaldır
-        console.log('🔍 carrier_company constraint'leri aranıyor ve kaldırılıyor...');
-        try {
-          // Yöntem 1: information_schema üzerinden
-          const constraintQuery1 = `
-            SELECT constraint_name 
-            FROM information_schema.table_constraints 
-            WHERE table_name = 'cargo_records' 
-            AND constraint_type = 'CHECK'
-          `;
-          const result1 = await dbManager.query(constraintQuery1);
-          if (result1.rows && result1.rows.length > 0) {
-            for (const row of result1.rows) {
-              const constraintName = row.constraint_name;
-              // Sadece carrier_company ile ilgili olanları kaldır
-              if (constraintName.includes('carrier') || constraintName.includes('company')) {
-                try {
-                  await dbManager.query(`ALTER TABLE cargo_records DROP CONSTRAINT IF EXISTS "${constraintName}" CASCADE`);
-                  console.log(`✅ Constraint kaldırıldı (yöntem 1): ${constraintName}`);
-                } catch (e) {
-                  console.log(`⚠️ Constraint kaldırılamadı (${constraintName}):`, e.message);
-                }
-              }
-            }
-          }
-          
-          // Yöntem 2: pg_constraint üzerinden (daha direkt)
-          const constraintQuery2 = `
-            SELECT conname 
-            FROM pg_constraint 
-            WHERE conrelid = 'cargo_records'::regclass 
-            AND contype = 'c'
-          `;
-          const result2 = await dbManager.query(constraintQuery2);
-          if (result2.rows && result2.rows.length > 0) {
-            for (const row of result2.rows) {
-              const constraintName = row.conname;
-              // Sadece carrier_company ile ilgili olanları kaldır
-              if (constraintName.includes('carrier') || constraintName.includes('company')) {
-                try {
-                  await dbManager.query(`ALTER TABLE cargo_records DROP CONSTRAINT IF EXISTS "${constraintName}" CASCADE`);
-                  console.log(`✅ Constraint kaldırıldı (yöntem 2): ${constraintName}`);
-                } catch (e) {
-                  console.log(`⚠️ Constraint kaldırılamadı (${constraintName}):`, e.message);
-                }
-              }
-            }
-          }
-          
-          // Yöntem 3: Bilinen constraint isimlerini direkt dene
-          const knownConstraintNames = [
-            'cargo_records_carrier_company_check',
-            'cargo_records_carrier_company_check1',
-            'cargo_records_carrier_company_check2',
-            'carrier_company_check',
-            'cargo_records_carrier_check'
-          ];
-          for (const constraintName of knownConstraintNames) {
-            try {
-              await dbManager.query(`ALTER TABLE cargo_records DROP CONSTRAINT IF EXISTS "${constraintName}" CASCADE`);
-              console.log(`✅ Bilinen constraint kaldırıldı: ${constraintName}`);
-            } catch (e) {
-              // Constraint yoksa hata verme
-            }
-          }
-        } catch (err) {
-          console.log('ℹ️ Constraint kaldırma denemesi:', err.message);
-        }
+        await removeCarrierCompanyConstraints();
         
         // PostgreSQL için
         // Users tablosu
@@ -737,4 +775,4 @@ const initDatabase = () => {
   });
 };
 
-module.exports = { db, initDatabase, dbManager, initializeDatabase, getDatabase };
+module.exports = { db, initDatabase, dbManager, initializeDatabase, getDatabase, removeCarrierCompanyConstraints };
