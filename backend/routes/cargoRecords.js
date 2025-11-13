@@ -142,12 +142,11 @@ router.post('/', (req, res) => {
     return;
   }
   
-  // Taşıyıcı firma validasyonu
-  const validCarrierCompanies = ['ptt', 'aras_aylin', 'aras_verar', 'aras_hatip', 'surat', 'yurtici', 'verar'];
-  if (!validCarrierCompanies.includes(carrierCompany)) {
-    console.error('Validation error: Invalid carrier company', carrierCompany);
+  // Taşıyıcı firma validasyonu (sadece boş olmamalı)
+  if (!carrierCompany || carrierCompany.trim() === '') {
+    console.error('Validation error: Empty carrier company');
     res.status(400).json({ 
-      error: `Geçersiz taşıyıcı firma. İzin verilen değerler: ${validCarrierCompanies.join(', ')}` 
+      error: 'Taşıyıcı firma boş olamaz' 
     });
     return;
   }
@@ -270,16 +269,13 @@ router.put('/:id', (req, res) => {
     photos
   } = req.body;
   
-  // Taşıyıcı firma validasyonu (eğer gönderilmişse)
-  if (carrierCompany) {
-    const validCarrierCompanies = ['ptt', 'aras_aylin', 'aras_verar', 'aras_hatip', 'surat', 'yurtici', 'verar'];
-    if (!validCarrierCompanies.includes(carrierCompany)) {
-      console.error('Validation error: Invalid carrier company', carrierCompany);
-      res.status(400).json({ 
-        error: `Geçersiz taşıyıcı firma. İzin verilen değerler: ${validCarrierCompanies.join(', ')}` 
-      });
-      return;
-    }
+  // Taşıyıcı firma validasyonu (eğer gönderilmişse, sadece boş olmamalı)
+  if (carrierCompany && carrierCompany.trim() === '') {
+    console.error('Validation error: Empty carrier company');
+    res.status(400).json({ 
+      error: 'Taşıyıcı firma boş olamaz' 
+    });
+    return;
   }
   
   const now = new Date().toISOString();

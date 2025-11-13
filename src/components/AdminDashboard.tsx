@@ -21,7 +21,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onLogout, 
   const [editFormData, setEditFormData] = useState({
     barcodeNumber: '',
     exitNumber: '',
-    carrierCompany: 'ptt' as 'ptt' | 'aras_aylin' | 'aras_verar' | 'aras_hatip' | 'surat' | 'yurtici' | 'verar',
+    carrierCompany: 'ptt' as 'ptt' | 'aras' | 'surat' | 'yurtici' | 'verar',
     senderCompany: '',
     recipientName: '',
     description: '',

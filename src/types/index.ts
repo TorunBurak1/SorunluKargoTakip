@@ -9,7 +9,7 @@ export interface CargoRecord {
   id: string;
   barcodeNumber: string;
   exitNumber: string;
-  carrierCompany: 'ptt' | 'aras_aylin' | 'aras_verar' | 'aras_hatip' | 'surat' | 'yurtici' | 'verar';
+  carrierCompany: 'ptt' | 'aras' | 'surat' | 'yurtici' | 'verar' | string;
   senderCompany: string;
   recipientName: string;
   description: string;
@@ -31,9 +31,7 @@ export type RecordStatus = 'open' | 'in_progress' | 'resolved' | 'paid' | 'rejec
 
 export const CARRIER_COMPANIES = [
   { value: 'ptt', label: 'PTT Kargo' },
-  { value: 'aras_aylin', label: 'Aras Aylin' },
-  { value: 'aras_verar', label: 'Aras Verar' },
-  { value: 'aras_hatip', label: 'Aras Hatip' },
+  { value: 'aras', label: 'Aras Kargo' },
   { value: 'surat', label: 'Sürat Kargo' },
   { value: 'yurtici', label: 'Yurtiçi Kargo' },
   { value: 'verar', label: 'Verar Kargo İstanbul' }

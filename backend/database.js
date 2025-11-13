@@ -509,7 +509,7 @@ const initDatabase = () => {
             id VARCHAR(255) PRIMARY KEY,
             barcode_number VARCHAR(255) NOT NULL,
             exit_number VARCHAR(255) NOT NULL,
-            carrier_company VARCHAR(50) NOT NULL CHECK(carrier_company IN ('ptt', 'aras_aylin', 'aras_verar', 'aras_hatip', 'surat', 'verar', 'yurtici')),
+            carrier_company VARCHAR(50) NOT NULL,
             sender_company VARCHAR(255) NOT NULL,
             recipient_name VARCHAR(255) NOT NULL,
             description TEXT NOT NULL,
@@ -543,6 +543,29 @@ const initDatabase = () => {
           `ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP`,
           `ALTER TABLE users ADD COLUMN IF NOT EXISTS password TEXT`
         ];
+        
+        // PostgreSQL'de mevcut constraint'i kaldırmaya çalış (varsa)
+        if (dbType === 'postgresql') {
+          try {
+            // Constraint ismini bul ve kaldır
+            const constraintQuery = `
+              SELECT constraint_name 
+              FROM information_schema.table_constraints 
+              WHERE table_name = 'cargo_records' 
+              AND constraint_type = 'CHECK' 
+              AND constraint_name LIKE '%carrier_company%'
+            `;
+            const constraintResult = await dbManager.query(constraintQuery);
+            if (constraintResult.rows && constraintResult.rows.length > 0) {
+              const constraintName = constraintResult.rows[0].constraint_name;
+              await dbManager.query(`ALTER TABLE cargo_records DROP CONSTRAINT IF EXISTS ${constraintName}`);
+              console.log(`✅ Eski carrier_company constraint kaldırıldı: ${constraintName}`);
+            }
+          } catch (err) {
+            // Constraint yoksa veya kaldırılamazsa devam et
+            console.log('ℹ️ Constraint kaldırma denemesi:', err.message);
+          }
+        }
 
         for (const query of alterQueries) {
           try {
@@ -575,7 +598,7 @@ const initDatabase = () => {
             id TEXT PRIMARY KEY,
             barcode_number TEXT NOT NULL,
             exit_number TEXT NOT NULL,
-            carrier_company TEXT NOT NULL CHECK(carrier_company IN ('ptt', 'aras_aylin', 'aras_verar', 'aras_hatip', 'surat', 'verar', 'yurtici')),
+            carrier_company TEXT NOT NULL,
             sender_company TEXT NOT NULL,
             recipient_name TEXT NOT NULL,
             description TEXT NOT NULL,

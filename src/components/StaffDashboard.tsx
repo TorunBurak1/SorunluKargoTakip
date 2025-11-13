@@ -10,13 +10,13 @@ interface StaffDashboardProps {
 }
 
 export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user, onLogout, onViewRecord }) => {
-  const { records, addRecord, updateRecord, updateRecordStatus, loading, error } = useRecords();
+  const { records, addRecord, updateRecord, updateRecordStatus, deleteRecord, loading, error } = useRecords();
   const [showForm, setShowForm] = useState(false);
   const [statusUpdateRecord, setStatusUpdateRecord] = useState<CargoRecord | null>(null);
   const [formData, setFormData] = useState({
     barcodeNumber: '',
     exitNumber: '',
-    carrierCompany: 'ptt' as 'ptt' | 'aras_aylin' | 'aras_verar' | 'aras_hatip' | 'surat' | 'yurtici' | 'verar',
+    carrierCompany: 'ptt' as 'ptt' | 'aras' | 'surat' | 'yurtici' | 'verar',
     senderCompany: '',
     recipientName: '',
     description: '',
@@ -34,7 +34,7 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user, onLogout, 
   const [editFormData, setEditFormData] = useState({
     barcodeNumber: '',
     exitNumber: '',
-    carrierCompany: 'ptt' as 'ptt' | 'aras_aylin' | 'aras_verar' | 'aras_hatip' | 'surat' | 'yurtici' | 'verar',
+    carrierCompany: 'ptt' as 'ptt' | 'aras' | 'surat' | 'yurtici' | 'verar',
     senderCompany: '',
     recipientName: '',
     description: '',
@@ -201,6 +201,18 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user, onLogout, 
   };
 
   // Kayıt düzenleme fonksiyonları
+  const handleDeleteClick = async (record: CargoRecord) => {
+    if (window.confirm(`"${record.barcodeNumber}" barkodlu kaydı silmek istediğinizden emin misiniz?`)) {
+      try {
+        await deleteRecord(record.id);
+        console.log('Kayıt silindi:', record.id);
+      } catch (error) {
+        console.error('Kayıt silinirken hata:', error);
+        alert('Kayıt silinirken hata oluştu');
+      }
+    }
+  };
+
   const handleEditClick = (record: CargoRecord) => {
     setEditRecord(record);
     setEditFormData({
@@ -611,6 +623,17 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ user, onLogout, 
                           >
                             <Edit className="w-4 h-4 mr-1" />
                             Düzenle
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteClick(record);
+                            }}
+                            className="flex items-center text-red-600 hover:text-red-900 text-xs font-medium transition-colors"
+                            title="Kaydı Sil"
+                          >
+                            <Trash2 className="w-4 h-4 mr-1" />
+                            Sil
                           </button>
                           {canChangeStatus(record.status) && (
                             <button
