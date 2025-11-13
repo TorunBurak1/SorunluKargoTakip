@@ -11,7 +11,7 @@ export const mockRecords: CargoRecord[] = [
     id: '1',
     barcodeNumber: '1234567890123',
     exitNumber: 'EX2024001234',
-    carrierCompany: 'aras',
+    carrierCompany: 'aras_aylin',
     senderCompany: 'Teknoloji A.Ş.',
     recipientName: 'Mehmet Yılmaz',
     description: 'Paket hasarlı şekilde teslim edildi. Müşteri şikayeti mevcut. Kutu ezik ve içerik zarar görmüş durumda.',

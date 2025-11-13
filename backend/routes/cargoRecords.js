@@ -142,6 +142,16 @@ router.post('/', (req, res) => {
     return;
   }
   
+  // Taşıyıcı firma validasyonu
+  const validCarrierCompanies = ['ptt', 'aras_aylin', 'aras_verar', 'aras_hatip', 'surat', 'yurtici', 'verar'];
+  if (!validCarrierCompanies.includes(carrierCompany)) {
+    console.error('Validation error: Invalid carrier company', carrierCompany);
+    res.status(400).json({ 
+      error: `Geçersiz taşıyıcı firma. İzin verilen değerler: ${validCarrierCompanies.join(', ')}` 
+    });
+    return;
+  }
+  
   const id = uuidv4();
   const now = new Date().toISOString();
   
@@ -259,6 +269,18 @@ router.put('/:id', (req, res) => {
     description,
     photos
   } = req.body;
+  
+  // Taşıyıcı firma validasyonu (eğer gönderilmişse)
+  if (carrierCompany) {
+    const validCarrierCompanies = ['ptt', 'aras_aylin', 'aras_verar', 'aras_hatip', 'surat', 'yurtici', 'verar'];
+    if (!validCarrierCompanies.includes(carrierCompany)) {
+      console.error('Validation error: Invalid carrier company', carrierCompany);
+      res.status(400).json({ 
+        error: `Geçersiz taşıyıcı firma. İzin verilen değerler: ${validCarrierCompanies.join(', ')}` 
+      });
+      return;
+    }
+  }
   
   const now = new Date().toISOString();
   
