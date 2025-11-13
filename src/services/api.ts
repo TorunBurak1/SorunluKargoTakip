@@ -43,22 +43,21 @@ export interface CreateCargoRecordData {
 }
 
 class ApiService {
-  // Timeout için AbortController kullan (Render free tier için 60 saniye)
-  private createTimeoutSignal(timeoutMs: number = 60000): AbortSignal {
+  // Timeout için AbortController kullan (15 saniye - daha hızlı yanıt)
+  private createTimeoutSignal(timeoutMs: number = 15000): AbortSignal {
     const controller = new AbortController();
     setTimeout(() => controller.abort(), timeoutMs);
     return controller.signal;
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}, retries: number = 3): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}, retries: number = 4): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
     console.log('API Service: Requesting URL:', url);
     
-    // Timeout ekle (60 saniye - Render free tier için) - eğer zaten bir signal varsa onu kullan
-    // Ama options'ta signal varsa onu kullan (çift timeout önlemek için)
+    // Timeout ekle (15 saniye) - eğer zaten bir signal varsa onu kullan
     let timeoutSignal = options.signal;
     if (!timeoutSignal) {
-      timeoutSignal = this.createTimeoutSignal(60000);
+      timeoutSignal = this.createTimeoutSignal(15000);
     }
     
     const config: RequestInit = {
@@ -92,35 +91,28 @@ class ApiService {
     } catch (error) {
       console.error('API Service: Request failed:', error);
       
-      // Abort hatası (timeout)
-      if (error instanceof Error && (error.name === 'AbortError' || error.message.includes('aborted'))) {
-        // Retry yapılabilir mi kontrol et
-        if (retries > 0) {
-          console.log(`API Service: Timeout hatası, retrying... (${retries} retries left)`);
-          // Render'da uyku modundan uyanma süresi uzun olabilir, daha uzun bekle
-          const waitTime = retries === 3 ? 5000 : 3000; // İlk retry'de 5 saniye, sonra 3 saniye
-          await new Promise(resolve => setTimeout(resolve, waitTime));
-          // Yeni timeout signal ile tekrar dene
-          const newOptions = { ...options };
-          delete newOptions.signal; // Signal'i kaldır ki yeni bir timeout oluşturulsun
-          return this.request<T>(endpoint, newOptions, retries - 1);
-        }
-        throw new Error('İstek zaman aşımına uğradı. Sunucu uyku modunda olabilir, lütfen birkaç saniye bekleyip tekrar deneyin.');
+      // Abort hatası (timeout) veya network hatası
+      const isTimeout = error instanceof Error && (error.name === 'AbortError' || error.message.includes('aborted'));
+      const isNetworkError = error instanceof TypeError && error.message.includes('fetch');
+      
+      if ((isTimeout || isNetworkError) && retries > 0) {
+        // Render'da sunucu uyku modundaysa uyandırmak için kısa retry'ler yap
+        const waitTime = 2000; // Her retry'de 2 saniye bekle
+        console.log(`API Service: ${isTimeout ? 'Timeout' : 'Network'} hatası, retrying... (${retries} retries left)`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        // Yeni timeout signal ile tekrar dene
+        const newOptions = { ...options };
+        delete newOptions.signal;
+        return this.request<T>(endpoint, newOptions, retries - 1);
       }
       
-      // Network hatalarını daha anlaşılır hale getir
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        // Retry yapılabilir mi kontrol et
-        if (retries > 0) {
-          console.log(`API Service: Network error, retrying... (${retries} retries left)`);
-          // Render'da uyku modundan uyanma süresi uzun olabilir
-          const waitTime = retries === 3 ? 5000 : 3000;
-          await new Promise(resolve => setTimeout(resolve, waitTime));
-          const newOptions = { ...options };
-          delete newOptions.signal;
-          return this.request<T>(endpoint, newOptions, retries - 1);
-        }
-        throw new Error('Sunucuya bağlanılamadı. Sunucu uyku modunda olabilir, lütfen birkaç saniye bekleyip tekrar deneyin.');
+      // Son retry'de de başarısız olursa hata fırlat
+      if (isTimeout) {
+        throw new Error('Sunucu yanıt vermiyor. Lütfen sayfayı yenileyip tekrar deneyin.');
+      }
+      
+      if (isNetworkError) {
+        throw new Error('Sunucuya bağlanılamadı. İnternet bağlantınızı kontrol edin.');
       }
       
       throw error;
