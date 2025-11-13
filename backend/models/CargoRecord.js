@@ -14,7 +14,7 @@ const cargoRecordSchema = new mongoose.Schema({
   carrierCompany: {
     type: String,
     required: [true, 'Taşıyıcı firma gerekli'],
-    enum: ['ptt', 'aras', 'surat', 'yurtici', 'verar', 'aras_aylin', 'aras_verar', 'aras_hatip']
+    enum: ['ptt', 'aras', 'surat', 'yurtici', 'verar']
   },
   senderCompany: {
     type: String,
@@ -84,6 +84,14 @@ cargoRecordSchema.index({ createdBy: 1 });
 cargoRecordSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model('CargoRecord', cargoRecordSchema);
+
+
+
+
+
+
+
+
 
 
 

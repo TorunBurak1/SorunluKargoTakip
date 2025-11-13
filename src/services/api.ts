@@ -13,7 +13,7 @@ export interface CargoRecord {
   id: string;
   barcodeNumber: string;
   exitNumber: string;
-  carrierCompany: 'aras_aylin' | 'aras_verar' | 'aras_hatip' | 'ptt' | 'surat' | 'verar' | 'yurtici';
+  carrierCompany: 'ptt' | 'aras' | 'surat' | 'yurtici' | 'verar' | string;
   senderCompany: string;
   description: string;
   photos: string[];
