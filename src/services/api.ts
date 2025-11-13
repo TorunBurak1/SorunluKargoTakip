@@ -43,19 +43,23 @@ export interface CreateCargoRecordData {
 }
 
 class ApiService {
-  // Timeout için AbortController kullan
-  private createTimeoutSignal(timeoutMs: number = 30000): AbortSignal {
+  // Timeout için AbortController kullan (Render free tier için 60 saniye)
+  private createTimeoutSignal(timeoutMs: number = 60000): AbortSignal {
     const controller = new AbortController();
     setTimeout(() => controller.abort(), timeoutMs);
     return controller.signal;
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}, retries: number = 2): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}, retries: number = 3): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
     console.log('API Service: Requesting URL:', url);
     
-    // Timeout ekle (30 saniye) - eğer zaten bir signal varsa onu kullan
-    const timeoutSignal = options.signal || this.createTimeoutSignal(30000);
+    // Timeout ekle (60 saniye - Render free tier için) - eğer zaten bir signal varsa onu kullan
+    // Ama options'ta signal varsa onu kullan (çift timeout önlemek için)
+    let timeoutSignal = options.signal;
+    if (!timeoutSignal) {
+      timeoutSignal = this.createTimeoutSignal(60000);
+    }
     
     const config: RequestInit = {
       headers: {
@@ -89,15 +93,19 @@ class ApiService {
       console.error('API Service: Request failed:', error);
       
       // Abort hatası (timeout)
-      if (error instanceof Error && error.name === 'AbortError') {
+      if (error instanceof Error && (error.name === 'AbortError' || error.message.includes('aborted'))) {
         // Retry yapılabilir mi kontrol et
         if (retries > 0) {
-          console.log(`API Service: Retrying... (${retries} retries left)`);
-          // 2 saniye bekle ve tekrar dene
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          return this.request<T>(endpoint, options, retries - 1);
+          console.log(`API Service: Timeout hatası, retrying... (${retries} retries left)`);
+          // Render'da uyku modundan uyanma süresi uzun olabilir, daha uzun bekle
+          const waitTime = retries === 3 ? 5000 : 3000; // İlk retry'de 5 saniye, sonra 3 saniye
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          // Yeni timeout signal ile tekrar dene
+          const newOptions = { ...options };
+          delete newOptions.signal; // Signal'i kaldır ki yeni bir timeout oluşturulsun
+          return this.request<T>(endpoint, newOptions, retries - 1);
         }
-        throw new Error('İstek zaman aşımına uğradı. Sunucu yanıt vermiyor. Lütfen tekrar deneyin.');
+        throw new Error('İstek zaman aşımına uğradı. Sunucu uyku modunda olabilir, lütfen birkaç saniye bekleyip tekrar deneyin.');
       }
       
       // Network hatalarını daha anlaşılır hale getir
@@ -105,9 +113,12 @@ class ApiService {
         // Retry yapılabilir mi kontrol et
         if (retries > 0) {
           console.log(`API Service: Network error, retrying... (${retries} retries left)`);
-          // 2 saniye bekle ve tekrar dene
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          return this.request<T>(endpoint, options, retries - 1);
+          // Render'da uyku modundan uyanma süresi uzun olabilir
+          const waitTime = retries === 3 ? 5000 : 3000;
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          const newOptions = { ...options };
+          delete newOptions.signal;
+          return this.request<T>(endpoint, newOptions, retries - 1);
         }
         throw new Error('Sunucuya bağlanılamadı. Sunucu uyku modunda olabilir, lütfen birkaç saniye bekleyip tekrar deneyin.');
       }
